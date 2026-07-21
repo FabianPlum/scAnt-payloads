@@ -24,10 +24,13 @@ the **manifest**, per-payload **documentation/notices**, and the
 |---------|---------|----------|---------|
 | [`flir-slim`](payloads/flir-slim/) | 4.2.0.88 (driver 2.7.3.640) | PySpin wheel (self-contained Spinnaker runtime) + WHQL-signed USB3 kernel driver + license texts | **proprietary — FLIR Spinnaker SDK License Agreement** |
 | [`env-lock`](payloads/env-lock/) | 2026.07.21 (micromamba 2.8.1-0) | micromamba + conda-lock/explicit lockfiles for the audited `scAnt_pro` env (win-64; conda packages stream from conda-forge at install time) | BSD-3-Clause (micromamba); lockfiles MIT |
+| [`shinestacker`](payloads/shinestacker/) | 1.15.0.post1.dev5 (upstream `fdea3546` + 2 patches) | patched focus-stacking wheel (headless, py3.10) + LGPL corresponding source + patches | **LGPL-3.0** |
+| [`exiftool`](payloads/exiftool/) | 13.59 | official ExifTool Windows build in scAnt layout (`exiftool.exe` + `exiftool_files/`) | Artistic/GPL (Perl terms) |
 
-More phase-1 payloads (shinestacker wheel, conda-lock, …) will be added one
-by one; upstream-hosted tools (COLMAP, Brush) are downloaded by the installer
-directly from their official releases and are *not* mirrored here.
+Upstream-hosted tools — **COLMAP 4.1.1** (cuda + nocuda) and **Brush
+v0.3.0** — are *not* mirrored here: the manifest pins their official GitHub
+release URLs + SHA-256 and the installer downloads them from upstream
+directly.
 
 ## Licensing
 

@@ -1,0 +1,26 @@
+diff --git a/src/shinestacker/config/settings.py b/src/shinestacker/config/settings.py
+index d9f1e126..c8b98a00 100644
+--- a/src/shinestacker/config/settings.py
++++ b/src/shinestacker/config/settings.py
+@@ -5,7 +5,10 @@ import traceback
+ import copy
+ import jsonpickle
+ import numpy as np
+-from PySide6.QtCore import QStandardPaths
++try:
++    from PySide6.QtCore import QStandardPaths
++except ImportError:  # headless / algorithms-only environments without Qt
++    QStandardPaths = None
+ from .. config.defaults import DEFAULTS
+ 
+ CURRENT_SETTINGS_FILE_VERSION = 1
+@@ -18,7 +21,8 @@ class StdPathFile:
+ 
+     def get_config_dir(self):
+         if self._config_dir is None:
+-            config_dir = QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
++            config_dir = (QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation)
++                          if QStandardPaths is not None else None)
+             if not config_dir:
+                 if os.name == 'nt':
+                     config_dir = os.path.join(os.environ.get('APPDATA', ''), 'ShineStacker')

@@ -1,0 +1,15 @@
+{
+  "payload": "exiftool",
+  "outputVersion": "13.59",
+  "inputs": [
+    {
+      "artifact": "exiftool-13.59_64.zip",
+      "sha256": "44b512b25af500724ba579d0a53c8fc5851628b692dd5e5d94ae4a15c2cba9ec",
+      "size": 11183675,
+      "source": "https://sourceforge.net/projects/exiftool/files/exiftool-13.59_64.zip/download (official exiftool SourceForge mirror; exiftool.org only serves the current release at unversioned-stable URLs)",
+      "role": "entire payload content, unmodified except renaming exiftool(-k).exe -> exiftool.exe (upstream's documented install step)"
+    }
+  ],
+  "docs": "README.md is version-controlled here; README_upstream.txt is carried from the upstream zip.",
+  "build": "pwsh build_payload.ps1"
+}

@@ -60,7 +60,11 @@ $sums | Out-File -Encoding utf8 "$stage\SHA256SUMS.txt"
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 $dateVer = Get-Date -Format "yyyy.MM.dd"
 $zipOut = Join-Path $OutDir "scAnt-payload-env-lock_${dateVer}_win64.zip"
-Compress-Archive -Path "$stage\*" -DestinationPath $zipOut -CompressionLevel Optimal -Force
+# bsdtar (in-box on Win10+) writes spec-conformant forward-slash zip entries;
+# PowerShell Compress-Archive writes backslashes, which breaks non-Windows unzip
+if (Test-Path $zipOut) { Remove-Item $zipOut -Force }
+tar -a -cf $zipOut -C $stage .
+if ($LASTEXITCODE -ne 0) { throw "tar zip creation failed" }
 Remove-Item $stage -Recurse -Force
 
 $zh = Get-FileHash $zipOut -Algorithm SHA256

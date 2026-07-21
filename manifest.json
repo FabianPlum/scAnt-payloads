@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "payloadSet": "0.2.0",
+  "payloadSet": "0.3.0",
   "updated": "2026-07-21",
   "components": [
     {
@@ -8,9 +8,9 @@
       "title": "FLIR camera support — PySpin runtime + USB3 driver (slim, no full SDK)",
       "version": "4.2.0.88",
       "driverVersion": "2.7.3.640",
-      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v0.2.0/scAnt-payload-flir-slim_4.2.0.88_win64.zip",
-      "sha256": "e7fb315e31038fb9617c88d939aaa3555dd32052fd661cd14a752f6e092cbfa2",
-      "size": 37951944,
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v0.3.0/scAnt-payload-flir-slim_4.2.0.88_win64.zip",
+      "sha256": "03b7e3188df4c5feafc877a01b97ba77e6f7196e16fc4d9f5fb2c37a1dbc3156",
+      "size": 37953594,
       "kind": "zip",
       "dest": "external/Spinnaker",
       "silentArgs": null,
@@ -28,9 +28,9 @@
       "title": "scAnt Python environment — micromamba + conda-lock (win-64)",
       "version": "2026.07.21",
       "micromambaVersion": "2.8.1-0",
-      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v0.2.0/scAnt-payload-env-lock_2026.07.21_win64.zip",
-      "sha256": "102124402dc5e40e9d50161977f9050ea369feb099e8946697ffe56c1c82cb3b",
-      "size": 4683436,
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v0.3.0/scAnt-payload-env-lock_2026.07.21_win64.zip",
+      "sha256": "159a18495f451c63ba1b14362d5da32ecd5527e203b34860e5ba8aeeaef4a271",
+      "size": 4684105,
       "kind": "zip",
       "dest": "payload-cache/env-lock",
       "silentArgs": null,
@@ -42,6 +42,89 @@
         "createEnv": "micromamba.exe create -y -p <install>\\env --file scAnt_pro-win-64.lock",
         "pipPins": "imutils==0.5.4 pyqtdarktheme==2.1.0 pyserial==3.5 PyYAML==6.0.3"
       }
+    },
+    {
+      "name": "shinestacker",
+      "title": "shinestacker focus-stacking library — patched wheel (headless, py3.10)",
+      "version": "1.15.0.post1.dev5",
+      "upstreamSha": "fdea354652439ddc5aabcdac811a1cfcd05a2911",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v0.3.0/scAnt-payload-shinestacker_1.15.0.post1.dev5_py3-none-any.zip",
+      "sha256": "b448bdc6573a919b42c454030f5d69e9c09c061963569090a1138e8e5d98dd96",
+      "size": 1372573,
+      "kind": "zip",
+      "dest": "payload-cache/shinestacker",
+      "silentArgs": null,
+      "licenseId": "LGPL-3.0-or-later",
+      "licenseUrl": "https://github.com/FabianPlum/scAnt-payloads/blob/main/payloads/shinestacker/README.md",
+      "eulaAccept": false,
+      "python": "py3-none-any",
+      "postInstall": {
+        "pipInstall": "wheel/shinestacker-1.15.0.post1.dev5-py3-none-any.whl"
+      }
+    },
+    {
+      "name": "exiftool",
+      "title": "ExifTool — EXIF metadata writer (official Windows build, scAnt layout)",
+      "version": "13.59",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v0.3.0/scAnt-payload-exiftool_13.59_win64.zip",
+      "sha256": "034f9c1f208516997e261ced33836c3c762aa38a7bc2f5a8ff821273053e9d89",
+      "size": 11156124,
+      "kind": "zip",
+      "dest": "external",
+      "silentArgs": null,
+      "licenseId": "Artistic-1.0-Perl OR GPL-1.0-or-later",
+      "licenseUrl": "https://github.com/FabianPlum/scAnt-payloads/blob/main/payloads/exiftool/README.md",
+      "eulaAccept": false
+    },
+    {
+      "name": "colmap-cuda",
+      "title": "COLMAP 4.1.1 with GLOMAP (CUDA) — SfM",
+      "version": "4.1.1",
+      "url": "https://github.com/colmap/colmap/releases/download/4.1.1/colmap-x64-windows-cuda.zip",
+      "sha256": "b06064e7e4bd34f5b4ef71b442d3537d95d57c666dbec5a3b475902ccd832b9b",
+      "size": 359029614,
+      "kind": "zip",
+      "hostedBy": "upstream",
+      "dest": "SPLAT/external/colmap",
+      "silentArgs": null,
+      "licenseId": "BSD-3-Clause",
+      "licenseUrl": "https://github.com/colmap/colmap/blob/main/COPYING.txt",
+      "eulaAccept": false,
+      "gpuGate": "nvidia-cc>=7.5-driver>=580",
+      "notes": "vendored LSD is AGPL-3.0 and SiftGPU is non-commercial — carried in THIRD-PARTY-NOTICES per INSTALLER_SPEC §5.4; global_mapper (GLOMAP) verified present"
+    },
+    {
+      "name": "colmap-nocuda",
+      "title": "COLMAP 4.1.1 with GLOMAP (no CUDA) — SfM fallback",
+      "version": "4.1.1",
+      "url": "https://github.com/colmap/colmap/releases/download/4.1.1/colmap-x64-windows-nocuda.zip",
+      "sha256": "faf1247d2ec90933aa8bd003709790abf0211cdc132cceec4c831718f2e0895a",
+      "size": 120217143,
+      "kind": "zip",
+      "hostedBy": "upstream",
+      "dest": "SPLAT/external/colmap",
+      "silentArgs": null,
+      "licenseId": "BSD-3-Clause",
+      "licenseUrl": "https://github.com/colmap/colmap/blob/main/COPYING.txt",
+      "eulaAccept": false,
+      "gpuGate": "fallback-no-nvidia-or-cc<7.5",
+      "notes": "same notice set as colmap-cuda"
+    },
+    {
+      "name": "brush",
+      "title": "Brush v0.3.0 — Gaussian-splat training (default splat backend)",
+      "version": "0.3.0",
+      "url": "https://github.com/ArthurBrussee/brush/releases/download/v0.3.0/brush-app-x86_64-pc-windows-msvc.zip",
+      "sha256": "b68e3e9cf052d51bf3ee30776fa5a364de7f2ba13b58443128ff797bb7bcfcd6",
+      "size": 158791348,
+      "kind": "zip",
+      "hostedBy": "upstream",
+      "dest": "SPLAT/external/brush",
+      "silentArgs": null,
+      "licenseId": "Apache-2.0",
+      "licenseUrl": "https://github.com/ArthurBrussee/brush/blob/main/LICENSE-APACHE",
+      "eulaAccept": false,
+      "notes": "sha256 matches upstream's published .sha256 asset; pinned deliberately at v0.3.0 per INSTALLER_SPEC §5.7 — do not bump without a scan-based A/B"
     }
   ]
 }

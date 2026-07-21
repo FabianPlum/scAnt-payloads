@@ -77,7 +77,11 @@ Pop-Location
 # 6. zip + report
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 $zipOut = Join-Path $OutDir "scAnt-payload-flir-slim_${ver}_win64.zip"
-Compress-Archive -Path "$stage\*" -DestinationPath $zipOut -CompressionLevel Optimal -Force
+# bsdtar (in-box on Win10+) writes spec-conformant forward-slash zip entries;
+# PowerShell Compress-Archive writes backslashes, which breaks non-Windows unzip
+if (Test-Path $zipOut) { Remove-Item $zipOut -Force }
+tar -a -cf $zipOut -C $stage .
+if ($LASTEXITCODE -ne 0) { throw "tar zip creation failed" }
 Remove-Item $stage -Recurse -Force
 
 $zh = Get-FileHash $zipOut -Algorithm SHA256
