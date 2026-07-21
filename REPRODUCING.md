@@ -77,6 +77,37 @@ present; probe on an SDK-free machine (`import PySpin` →
 `GetLibraryVersion()` = wheel's own version → camera enumeration); download
 round-trip hash check against the manifest pin.
 
+## The bootstrap installer
+
+`installer/build_installer.ps1` builds `scAnt-Setup-<payloadSet>.exe` from:
+
+1. a **scAnt_pro checkout** (private repo) — the app tree is `git archive`d
+   at HEAD and pruned (legacy Hugin suite, focus-stack debug artifacts,
+   internal docs); the exact commit is recorded as `APP_TREE_SHA.txt`
+   inside every install, in `build/pins.iss`, and in the release notes;
+2. the **payload zips** (env-lock, shinestacker; flir-slim only for the
+   EULA text — no FLIR binaries are embedded), each SHA-256-verified
+   against `manifest.json` (downloaded from the release, or supplied via
+   `-LocalPayloadDir`);
+3. **Inno Setup 7** (`ISCC.exe`).
+
+The exe's own hash differs per build (compression timestamps) — as with
+payload zips, reproducibility is **content-level**: the same scAnt_pro
+commit + the same manifest payload set produce the same installed tree,
+verified by the installer's §8 smoke tests. Installer releases live on the
+**private scAnt_pro repo** (the exe embeds the private app tree; this
+public repo carries only the installer *sources*).
+
+### Known provenance gap
+
+`external/focus-stack/focus-stack.exe` in the app tree is a local build:
+`focus-stack 1.3-30-g953c7fa-dirty` (2024-11-14, OpenCV 4.10.0), sha256
+`d9a1597a7200e728106306a408739b2487eb9d1e6ff116bac3940e3eddd236a5`.
+The `-dirty` flag means locally modified sources — it is pinned here by
+hash, but cannot yet be rebuilt from a public recipe. Open item: publish
+the patched source / build recipe (or move to a pinned upstream release)
+when focus-stack is next touched.
+
 ## Adding a new payload
 
 1. Create `payloads/<name>/` with:

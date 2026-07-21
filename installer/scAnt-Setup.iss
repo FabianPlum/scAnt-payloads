@@ -31,6 +31,9 @@ ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 SetupLogging=yes
 UninstallDisplayName=scAnt
+SetupIconFile=build\scAnt_icon.ico
+UninstallDisplayIcon={app}\app\images\scAnt_icon.ico
+AppComments=app tree {#AppTreeSha}
 
 [Messages]
 WelcomeLabel2=This will install the scAnt scanning and processing pipeline on your computer.%n%nNOTE: the integrated Gaussian-splatting pipeline (COLMAP CUDA + splat training) is supported and tested on NVIDIA GPUs; a CUDA-compatible NVIDIA GPU is required for the full workflow.
@@ -55,7 +58,7 @@ Source: "build\third_party\*"; DestDir: "{app}\third_party_licenses"; Flags: rec
 Source: "build\eula\FLIR_license.txt"; Flags: dontcopy
 
 [Icons]
-Name: "{userprograms}\scAnt"; Filename: "{app}\env\python.exe"; Parameters: "scAnt.py"; WorkingDir: "{app}\app"; Comment: "scAnt 3D scanner"
+Name: "{userprograms}\scAnt"; Filename: "{app}\env\python.exe"; Parameters: "scAnt.py"; WorkingDir: "{app}\app"; IconFilename: "{app}\app\images\scAnt_icon.ico"; Comment: "scAnt 3D scanner"
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\env"
