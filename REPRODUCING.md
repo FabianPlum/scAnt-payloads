@@ -98,15 +98,15 @@ verified by the installer's §8 smoke tests. Installer releases live on the
 **private scAnt_pro repo** (the exe embeds the private app tree; this
 public repo carries only the installer *sources*).
 
-### Known provenance gap
+### Provenance gap — resolved (payload set 0.3.1)
 
-`external/focus-stack/focus-stack.exe` in the app tree is a local build:
-`focus-stack 1.3-30-g953c7fa-dirty` (2024-11-14, OpenCV 4.10.0), sha256
-`d9a1597a7200e728106306a408739b2487eb9d1e6ff116bac3940e3eddd236a5`.
-The `-dirty` flag means locally modified sources — it is pinned here by
-hash, but cannot yet be rebuilt from a public recipe. Open item: publish
-the patched source / build recipe (or move to a pinned upstream release)
-when focus-stack is next touched.
+Until 0.3.0 the app tree carried a local focus-stack build
+(`1.3-30-g953c7fa-dirty`, unpublished modifications). Since **0.3.1**,
+focus-stack is a regular payload built from the official upstream release
+(PetteriAimonen/focus-stack tag 1.5, hash-pinned in
+`payloads/focus-stack/inputs.json`) and embedded by the installer as a
+mandatory part of core — every artifact in the chain now traces to a
+pinned public source.
 
 ## Adding a new payload
 
