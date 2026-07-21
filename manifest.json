@@ -1,6 +1,6 @@
 {
   "manifestVersion": 1,
-  "payloadSet": "0.1.0",
+  "payloadSet": "0.2.0",
   "updated": "2026-07-21",
   "components": [
     {
@@ -8,7 +8,7 @@
       "title": "FLIR camera support — PySpin runtime + USB3 driver (slim, no full SDK)",
       "version": "4.2.0.88",
       "driverVersion": "2.7.3.640",
-      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v0.1.0/scAnt-payload-flir-slim_4.2.0.88_win64.zip",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v0.2.0/scAnt-payload-flir-slim_4.2.0.88_win64.zip",
       "sha256": "e7fb315e31038fb9617c88d939aaa3555dd32052fd661cd14a752f6e092cbfa2",
       "size": 37951944,
       "kind": "zip",
@@ -21,6 +21,26 @@
       "postInstall": {
         "pipInstall": "wheel/spinnaker_python-4.2.0.88-cp310-cp310-win_amd64.whl",
         "driverInf": "driver/PGRUsb3/PGRUSBCam3.inf"
+      }
+    },
+    {
+      "name": "env-lock",
+      "title": "scAnt Python environment — micromamba + conda-lock (win-64)",
+      "version": "2026.07.21",
+      "micromambaVersion": "2.8.1-0",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v0.2.0/scAnt-payload-env-lock_2026.07.21_win64.zip",
+      "sha256": "102124402dc5e40e9d50161977f9050ea369feb099e8946697ffe56c1c82cb3b",
+      "size": 4683436,
+      "kind": "zip",
+      "dest": "payload-cache/env-lock",
+      "silentArgs": null,
+      "licenseId": "BSD-3-Clause",
+      "licenseUrl": "https://github.com/FabianPlum/scAnt-payloads/blob/main/payloads/env-lock/micromamba_LICENSE.txt",
+      "eulaAccept": false,
+      "python": "cp310",
+      "postInstall": {
+        "createEnv": "micromamba.exe create -y -p <install>\\env --file scAnt_pro-win-64.lock",
+        "pipPins": "imutils==0.5.4 pyqtdarktheme==2.1.0 pyserial==3.5 PyYAML==6.0.3"
       }
     }
   ]

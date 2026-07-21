@@ -23,11 +23,13 @@ param(
     [Parameter(Mandatory)] [string]$WheelPath,
     [string]$DriverDir = "C:\Program Files\Teledyne\Spinnaker\driver64\PGRUsb3",
     [Parameter(Mandatory)] [string]$PySpinZip,
-    [string]$OutDir = "$PSScriptRoot\dist"
+    [string]$OutDir
 )
 
 $ErrorActionPreference = "Stop"
 $payloadDocs = $PSScriptRoot
+# $PSScriptRoot is not available in param defaults on Windows PowerShell 5.1
+if (-not $OutDir) { $OutDir = Join-Path $PSScriptRoot "dist" }
 
 $wheelName = Split-Path $WheelPath -Leaf
 if ($wheelName -notmatch "^spinnaker_python-(\d+\.\d+\.\d+\.\d+)-") {

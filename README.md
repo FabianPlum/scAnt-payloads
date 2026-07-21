@@ -23,6 +23,7 @@ the **manifest**, per-payload **documentation/notices**, and the
 | Payload | Version | Contents | License |
 |---------|---------|----------|---------|
 | [`flir-slim`](payloads/flir-slim/) | 4.2.0.88 (driver 2.7.3.640) | PySpin wheel (self-contained Spinnaker runtime) + WHQL-signed USB3 kernel driver + license texts | **proprietary — FLIR Spinnaker SDK License Agreement** |
+| [`env-lock`](payloads/env-lock/) | 2026.07.21 (micromamba 2.8.1-0) | micromamba + conda-lock/explicit lockfiles for the audited `scAnt_pro` env (win-64; conda packages stream from conda-forge at install time) | BSD-3-Clause (micromamba); lockfiles MIT |
 
 More phase-1 payloads (shinestacker wheel, conda-lock, …) will be added one
 by one; upstream-hosted tools (COLMAP, Brush) are downloaded by the installer

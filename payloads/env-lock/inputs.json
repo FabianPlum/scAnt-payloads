@@ -1,0 +1,25 @@
+{
+  "payload": "env-lock",
+  "outputVersion": "2026.07.21",
+  "inputs": [
+    {
+      "artifact": "micromamba-win-64.exe",
+      "version": "2.8.1-0",
+      "sha256": "8a51f88ec02600488ea20c3acd93fbd4da6c0f03fc499aa53fd234c6749b94b0",
+      "source": "https://github.com/mamba-org/micromamba-releases/releases/download/2.8.1-0/micromamba-win-64.exe (hash cross-checked against the release's micromamba-win-64.sha256)",
+      "role": "micromamba.exe — env creator, BSD-3-Clause"
+    },
+    {
+      "artifact": "conda-lock.yml / scAnt_pro-win-64.lock",
+      "source": "rendered from scAnt repo conda_environment/scAnt_Pro_WINDOWS.yml with conda-lock 4.0.2 (micromamba solver) on 2026-07-21; every conda package pinned by exact build + md5 in the lockfile itself",
+      "role": "environment definition (152 conda pkgs + 5 pip pins, win-64)"
+    },
+    {
+      "artifact": "micromamba_LICENSE.txt",
+      "source": "https://raw.githubusercontent.com/mamba-org/mamba/main/LICENSE",
+      "role": "licenses/ — BSD-3-Clause notice for redistributing micromamba"
+    }
+  ],
+  "docs": "README.md is version-controlled here and staged into the archive root at build time. Lockfiles are version-controlled in the scAnt repo (conda_environment/) and copied in at build time.",
+  "build": "pwsh build_payload.ps1 -ScAntRepo <path-to-scAnt_pro-checkout>"
+}
