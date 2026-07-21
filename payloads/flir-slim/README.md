@@ -56,6 +56,23 @@ pnputil /enum-drivers
 pnputil /delete-driver oemNN.inf
 ```
 
+### Known full-SDK uninstall leftovers (validated 2026-07-21)
+
+If a machine previously had the full Spinnaker SDK installed, uninstalling
+its MSIs (verified with 4.3.0.190) does **not** remove:
+
+- the `pgrusbcam3.inf` driver-store entry (the camera stays bound; remove
+  with `pnputil /delete-driver` if genuinely wanted),
+- machine environment variables `GENICAM_GENTL32_PATH`,
+  `GENICAM_GENTL64_PATH`, `SPINNAKER_GENTL32_CTI_VS140`,
+  `SPINNAKER_GENTL64_CTI_VS140` (left dangling; the DALSA-named
+  `TELEDYNE_DALSA_*` variables belong to a different product),
+- an empty `C:\Program Files\Teledyne\Spinnaker` directory skeleton.
+
+None of these affect this payload: the wheel resolves its DLLs from inside
+the `PySpin` package (same-directory resolution), verified working with the
+SDK uninstalled and those variables still dangling.
+
 ## Notes
 
 - USB3 cameras only. GigE cameras need the PGRLWF filter driver (not
