@@ -1,0 +1,27 @@
+{
+  "manifestVersion": 1,
+  "payloadSet": "0.1.0",
+  "updated": "2026-07-21",
+  "components": [
+    {
+      "name": "flir-slim",
+      "title": "FLIR camera support — PySpin runtime + USB3 driver (slim, no full SDK)",
+      "version": "4.2.0.88",
+      "driverVersion": "2.7.3.640",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v0.1.0/scAnt-payload-flir-slim_4.2.0.88_win64.zip",
+      "sha256": "697faf4b83a55aef60e31c3886bef12cf4fbd1b06a2e2ede809aca2cc83e2cec",
+      "size": 37951421,
+      "kind": "zip",
+      "dest": "external/Spinnaker",
+      "silentArgs": null,
+      "licenseId": "LicenseRef-FLIR-Spinnaker-EULA",
+      "licenseUrl": "https://github.com/FabianPlum/scAnt-payloads/blob/main/payloads/flir-slim/NOTICE.txt",
+      "eulaAccept": true,
+      "python": "cp310",
+      "postInstall": {
+        "pipInstall": "wheel/spinnaker_python-4.2.0.88-cp310-cp310-win_amd64.whl",
+        "driverInf": "driver/PGRUsb3/PGRUSBCam3.inf"
+      }
+    }
+  ]
+}

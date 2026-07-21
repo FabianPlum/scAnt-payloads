@@ -1,0 +1,61 @@
+NOTICE — FLIR / Spinnaker slim runtime payload for scAnt
+=========================================================
+
+This package is NOT open source and is NOT covered by the MIT license of the
+scAnt project.
+
+The files under wheel/ and driver/ are proprietary components of the Teledyne
+FLIR Spinnaker(R) SDK and are governed exclusively by the FLIR Spinnaker SDK
+License Agreement — see licenses/FLIR_license.txt. By downloading, installing
+or using these files you accept that agreement. In particular:
+
+  * Use them only in conjunction with FLIR machine-vision cameras that you
+    own (Spinnaker SDK License Agreement, Section 1).
+  * Do not redistribute them further (Section 4(c)).
+  * Keep this notice and all license files intact (Section 4(d)).
+
+These files are redistributed by the scAnt project as part of the scAnt
+scanner product (which incorporates a FLIR Blackfly S camera) under the OEM
+provisions of Section 4 of the Spinnaker SDK License Agreement: the package
+contains only dynamically linked libraries, drivers (.inf/.sys and their
+signature catalog), and license documentation — no headers, static libraries
+or other development-only material.
+
+Contents and provenance (all files unmodified):
+
+  wheel/spinnaker_python-4.2.0.88-cp310-cp310-win_amd64.whl
+      Teledyne's official PySpin wheel for Python 3.10 / Windows x64. It
+      bundles the complete Spinnaker runtime (Spinnaker_v140.dll, GenTL
+      producer, GenICam runtime, log4cpp, libiomp5md) including FFmpeg
+      libraries licensed under the GNU LGPL v2.1 — see
+      licenses/FFmpeg_compliance_doc.txt (which links the exact FFmpeg
+      source revision) and licenses/LGPL-2.1.txt.
+
+  driver/PGRUsb3/
+      WHQL-signed USB3 camera kernel driver, version 2.7.3.640 (2023-05-06):
+      PGRUSBCam3.inf, PGRUSBCam3.sys, pgrusbcam3.cat, WdfCoInstaller01009.dll,
+      taken unmodified from the Spinnaker SDK 4.3.0.190 Windows installation
+      (driver64/PGRUsb3). Covers USB3 Vision cameras (e.g. Blackfly S USB3).
+      GigE cameras additionally need the PGRLWF filter driver, which is not
+      included here.
+
+  licenses/FLIR_license.txt
+  licenses/Spinnaker-Open-Source-Licenses.pdf
+  licenses/FFmpeg_compliance_doc.txt
+      Unmodified license documentation from Teledyne's official PySpin
+      Windows distribution (spinnaker_python-4.3.0.190 zip; the license
+      agreement is the current one published by Teledyne and applies to the
+      SDK including the 4.2.0.88 runtime shipped here).
+
+  licenses/LGPL-2.1.txt
+      Verbatim text of the GNU Lesser General Public License v2.1, added by
+      the scAnt project because the wheel conveys LGPL-2.1-licensed FFmpeg
+      binaries.
+
+Free and open-source components contained in the SDK are governed solely by
+their own license agreements (Spinnaker SDK License Agreement, Section 2);
+see licenses/Spinnaker-Open-Source-Licenses.pdf for the aggregate listing.
+
+FLIR(R) and Spinnaker(R) are trademarks of Teledyne FLIR LLC. scAnt is not
+affiliated with or endorsed by Teledyne FLIR. All names are used for
+identification purposes only.
