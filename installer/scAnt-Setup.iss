@@ -34,6 +34,13 @@ UninstallDisplayName=scAnt
 SetupIconFile=build\scAnt_icon.ico
 UninstallDisplayIcon={app}\app\images\scAnt_icon.ico
 AppComments=app tree {#AppTreeSha}
+; file-properties metadata (SmartScreen's "Publisher" comes from the code
+; signature only — signed under scAnt UG after internal testing)
+VersionInfoCompany=scAnt UG
+VersionInfoDescription=scAnt Setup
+VersionInfoProductName=scAnt
+VersionInfoVersion={#PayloadSetVersion}
+VersionInfoCopyright=(c) 2026 scAnt UG
 
 [Messages]
 WelcomeLabel2=This will install the scAnt scanning and processing pipeline on your computer.%n%nNOTE: the integrated Gaussian-splatting pipeline (COLMAP CUDA + splat training) is supported and tested on NVIDIA GPUs; a CUDA-compatible NVIDIA GPU is required for the full workflow.
