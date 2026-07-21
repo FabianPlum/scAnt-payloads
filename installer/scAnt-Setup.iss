@@ -50,12 +50,15 @@ Name: "full"; Description: "Full installation"
 Name: "custom"; Description: "Custom installation"; Flags: iscustom
 
 [Components]
-Name: "core"; Description: "scAnt core (app, Python environment, stacking, exiftool)"; Types: full custom; Flags: fixed
-Name: "flir"; Description: "FLIR camera support (PySpin + USB3 driver — proprietary Teledyne EULA)"; Types: full
+; ExtraDiskSpaceRequired covers what Inno cannot see: downloaded archives,
+; their extraction, and the micromamba-created Python env (measured on a
+; real full install, slightly conservative)
+Name: "core"; Description: "scAnt core (app, Python environment, stacking, exiftool)"; Types: full custom; Flags: fixed; ExtraDiskSpaceRequired: 2700000000
+Name: "flir"; Description: "FLIR camera support (PySpin + USB3 driver — proprietary Teledyne EULA)"; Types: full; ExtraDiskSpaceRequired: 200000000
 Name: "colmap"; Description: "3D reconstruction — COLMAP 4.1.1 with GLOMAP"; Types: full
-Name: "colmap\cuda"; Description: "CUDA build — strongly recommended on NVIDIA GPUs (Turing+, driver >= 580); much faster reconstruction"; Flags: exclusive
-Name: "colmap\nocuda"; Description: "CPU/OpenGL build — only if you have no suitable NVIDIA GPU"; Flags: exclusive
-Name: "brush"; Description: "Gaussian-splat training — Brush v0.3.0"; Types: full
+Name: "colmap\cuda"; Description: "CUDA build — strongly recommended on NVIDIA GPUs (Turing+, driver >= 580); much faster reconstruction"; Flags: exclusive; ExtraDiskSpaceRequired: 1100000000
+Name: "colmap\nocuda"; Description: "CPU/OpenGL build — only if you have no suitable NVIDIA GPU"; Flags: exclusive; ExtraDiskSpaceRequired: 500000000
+Name: "brush"; Description: "Gaussian-splat training — Brush v0.3.0"; Types: full; ExtraDiskSpaceRequired: 320000000
 
 [Files]
 Source: "build\app\*"; DestDir: "{app}\app"; Flags: recursesubdirs createallsubdirs ignoreversion; Components: core

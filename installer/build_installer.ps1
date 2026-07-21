@@ -102,7 +102,10 @@ $flirComp = Get-Component "flir-slim"
 $fx = Join-Path $env:TEMP "flirx-$([guid]::NewGuid().ToString('N'))"
 New-Item -ItemType Directory -Force $fx | Out-Null
 tar -xf (Get-PayloadZip $flirComp) -C $fx "licenses/FLIR_license.txt"
-Copy-Item "$fx\licenses\FLIR_license.txt" (Join-Path $buildDir "eula")
+# the wizard memo renders ANSI — transcode the display copy to Windows-1252
+# (every character in the EULA exists there; the payload itself stays UTF-8)
+$eulaText = [System.IO.File]::ReadAllText("$fx\licenses\FLIR_license.txt", [System.Text.Encoding]::UTF8)
+[System.IO.File]::WriteAllText((Join-Path $buildDir "eula\FLIR_license.txt"), $eulaText, [System.Text.Encoding]::GetEncoding(1252))
 Remove-Item $fx -Recurse -Force
 
 # ---- 5. pins.iss from the manifest ----
