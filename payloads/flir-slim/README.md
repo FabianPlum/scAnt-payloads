@@ -54,6 +54,8 @@ pip uninstall spinnaker-python
 # find the published driver name (oemNN.inf) for pgrusbcam3.inf, then:
 pnputil /enum-drivers
 pnputil /delete-driver oemNN.inf
+# add /uninstall if a connected camera is still using the driver:
+#   pnputil /delete-driver oemNN.inf /uninstall
 ```
 
 ### Known full-SDK uninstall leftovers (validated 2026-07-21)
@@ -65,8 +67,10 @@ its MSIs (verified with 4.3.0.190) does **not** remove:
   with `pnputil /delete-driver` if genuinely wanted),
 - machine environment variables `GENICAM_GENTL32_PATH`,
   `GENICAM_GENTL64_PATH`, `SPINNAKER_GENTL32_CTI_VS140`,
-  `SPINNAKER_GENTL64_CTI_VS140` (left dangling; the DALSA-named
-  `TELEDYNE_DALSA_*` variables belong to a different product),
+  `SPINNAKER_GENTL64_CTI_VS140` (left dangling; already-running sessions
+  may additionally retain a stale `SPINNAKER_INSTALL_PATH` and a
+  `...\Teledyne\Spinnaker\bin64\vs2015` PATH entry until logoff; the
+  DALSA-named `TELEDYNE_DALSA_*` variables belong to a different product),
 - an empty `C:\Program Files\Teledyne\Spinnaker` directory skeleton.
 
 None of these affect this payload: the wheel resolves its DLLs from inside
