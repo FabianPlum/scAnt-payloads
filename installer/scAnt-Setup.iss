@@ -43,8 +43,8 @@ Name: "custom"; Description: "Custom installation"; Flags: iscustom
 Name: "core"; Description: "scAnt core (app, Python environment, stacking, exiftool)"; Types: full custom; Flags: fixed
 Name: "flir"; Description: "FLIR camera support (PySpin + USB3 driver — proprietary Teledyne EULA)"; Types: full
 Name: "colmap"; Description: "3D reconstruction — COLMAP 4.1.1 with GLOMAP"; Types: full
-Name: "colmap\cuda"; Description: "CUDA build (NVIDIA Turing or newer, driver >= 580)"; Flags: exclusive
-Name: "colmap\nocuda"; Description: "CPU/OpenGL build (no NVIDIA CUDA)"; Flags: exclusive
+Name: "colmap\cuda"; Description: "CUDA build — strongly recommended on NVIDIA GPUs (Turing+, driver >= 580); much faster reconstruction"; Flags: exclusive
+Name: "colmap\nocuda"; Description: "CPU/OpenGL build — only if you have no suitable NVIDIA GPU"; Flags: exclusive
 Name: "brush"; Description: "Gaussian-splat training — Brush v0.3.0"; Types: full
 
 [Files]
@@ -70,6 +70,7 @@ var
   EulaPage: TOutputMsgMemoWizardPage;
   EulaAccept, EulaDecline: TNewRadioButton;
   GpuCudaOk: Boolean;
+  GpuVerdict: String;   { 'cuda' | 'no-nvidia' | 'old-driver' | 'unknown' }
   DidPreselect: Boolean;
 
 { ---------- helpers ---------- }
@@ -106,8 +107,12 @@ var
 begin
   GpuCudaOk := False;
   TmpFile := ExpandConstant('{tmp}\gpuprobe.txt');
+  { try Sysnative (64-bit view for a 32-bit process), then System32, then PATH —
+    nvidia-smi lives only in the real System32, invisible through WOW64 redirection }
   if Exec(ExpandConstant('{sys}\cmd.exe'),
-      '/S /C "nvidia-smi --query-gpu=compute_cap,driver_version --format=csv,noheader > "' + TmpFile + '" 2>&1"',
+      '/S /C ""%SystemRoot%\Sysnative\nvidia-smi.exe" --query-gpu=compute_cap,driver_version --format=csv,noheader > "' + TmpFile + '" 2>nul' +
+      ' || "%SystemRoot%\System32\nvidia-smi.exe" --query-gpu=compute_cap,driver_version --format=csv,noheader > "' + TmpFile + '" 2>nul' +
+      ' || nvidia-smi --query-gpu=compute_cap,driver_version --format=csv,noheader > "' + TmpFile + '" 2>nul"',
       '', SW_HIDE, ewWaitUntilTerminated, ResultCode) and (ResultCode = 0) then
   begin
     if LoadStringFromFile(TmpFile, AnsiS) then begin
@@ -126,12 +131,21 @@ begin
         D := Pos('.', Drvs);
         if D > 0 then Drvs := Copy(Drvs, 1, D - 1);
         DrvMaj := StrToIntDef(Drvs, 0);
-        GpuCudaOk := ((CCMaj > 7) or ((CCMaj = 7) and (CCMin >= 5))) and (DrvMaj >= 580);
-        Log('GPU gate: cc=' + CCs + ' driver=' + IntToStr(DrvMaj) + ' -> cuda=' + IntToStr(Ord(GpuCudaOk)));
+        if (CCMaj > 7) or ((CCMaj = 7) and (CCMin >= 5)) then begin
+          if DrvMaj >= 580 then begin
+            GpuCudaOk := True;
+            GpuVerdict := 'cuda';
+          end else
+            GpuVerdict := 'old-driver';
+        end else
+          GpuVerdict := 'no-nvidia';
+        Log('GPU gate: cc=' + CCs + ' driver=' + IntToStr(DrvMaj) + ' -> ' + GpuVerdict);
       end;
     end;
-  end else
-    Log('nvidia-smi not available -> nocuda');
+  end else begin
+    GpuVerdict := 'unknown';
+    Log('nvidia-smi not available -> verdict unknown');
+  end;
 end;
 
 { ---------- wizard ---------- }
@@ -171,13 +185,30 @@ end;
 
 procedure CurPageChanged(CurPageID: Integer);
 begin
+  { wizard pages are walked in silent installs too — never override the
+    command line's /COMPONENTS selection there }
+  if WizardSilent then
+    exit;
   if (CurPageID = wpSelectComponents) and not DidPreselect then begin
     DidPreselect := True;
-    { preselect the GPU-appropriate COLMAP build, once }
+    { preselect the GPU-appropriate COLMAP build, once; the CUDA build is
+      strongly preferred on capable machines — when detection is not
+      conclusive, tell the user and let them decide }
     if GpuCudaOk then
       WizardSelectComponents('colmap\cuda')
-    else
+    else begin
       WizardSelectComponents('colmap\nocuda');
+      if GpuVerdict = 'old-driver' then
+        MsgBox('An NVIDIA GPU capable of the (much faster) CUDA reconstruction build was detected, ' +
+               'but your NVIDIA driver is older than version 580.' + #13#10#13#10 +
+               'Recommended: update the NVIDIA driver and select the CUDA build of COLMAP on the component page. ' +
+               'The CPU/OpenGL build has been preselected for now.', mbInformation, MB_OK)
+      else if GpuVerdict = 'unknown' then
+        MsgBox('Your GPU could not be detected automatically.' + #13#10#13#10 +
+               'If this machine has an NVIDIA GPU (GeForce RTX / Turing or newer), please select the ' +
+               'CUDA build of COLMAP on the component page — it is strongly recommended and much faster. ' +
+               'The CPU/OpenGL build has been preselected as the safe default.', mbInformation, MB_OK);
+    end;
   end;
 end;
 
@@ -223,16 +254,24 @@ begin
       exit;
     end;
 
+  Log('selection: flir=' + IntToStr(Ord(WizardIsComponentSelected('flir'))) +
+      ' colmap=' + IntToStr(Ord(WizardIsComponentSelected('colmap'))) +
+      ' cuda=' + IntToStr(Ord(WizardIsComponentSelected('colmap\cuda'))) +
+      ' nocuda=' + IntToStr(Ord(WizardIsComponentSelected('colmap\nocuda'))) +
+      ' brush=' + IntToStr(Ord(WizardIsComponentSelected('brush'))));
+
   try
     if WizardIsComponentSelected('flir') then begin
       Status('Downloading FLIR payload ({#FlirSizeMB} MB)...');
       DownloadTemporaryFile('{#FlirUrl}', 'flir-slim.zip', '{#FlirSha256}', nil);
     end;
+    { the cuda/nocuda children are UI-exclusive, but /COMPONENTS on the command
+      line can select both — cuda wins, and only one colmap.zip is fetched }
     if WizardIsComponentSelected('colmap\cuda') then begin
       Status('Downloading COLMAP CUDA ({#ColmapCudaSizeMB} MB)...');
       DownloadTemporaryFile('{#ColmapCudaUrl}', 'colmap.zip', '{#ColmapCudaSha256}', nil);
-    end;
-    if WizardIsComponentSelected('colmap\nocuda') then begin
+    end
+    else if WizardIsComponentSelected('colmap\nocuda') then begin
       Status('Downloading COLMAP ({#ColmapNocudaSizeMB} MB)...');
       DownloadTemporaryFile('{#ColmapNocudaUrl}', 'colmap.zip', '{#ColmapNocudaSha256}', nil);
     end;
@@ -262,8 +301,11 @@ end;
 
 function DriverPresent: Boolean;
 begin
-  Result := RunHidden('pnputil /enum-drivers | findstr /i pgrusbcam3',
-                      ExpandConstant('{app}\provision.log')) = 0;
+  { the driver service key exists iff the PGRUsb3 driver is installed;
+    the SYSTEM hive has no WOW64 redirection, unlike file checks under
+    the sys constant from a 32-bit setup process, which silently hit SysWOW64 }
+  Result := RegKeyExists(HKEY_LOCAL_MACHINE, 'SYSTEM\CurrentControlSet\Services\PGRUSBCam3');
+  Log('DriverPresent (service key): ' + IntToStr(Ord(Result)));
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
@@ -293,7 +335,8 @@ begin
 
   Status('Installing Python packages...');
   if RunHidden('"' + Py + '" -m pip install --no-warn-script-location {#PipPins}', PLog) <> 0 then Fails := Fails + 1;
-  if RunHidden('"' + Py + '" -m pip install --no-warn-script-location --no-index "' +
+  { no --no-index here: the shinestacker wheel pulls its own deps from PyPI }
+  if RunHidden('"' + Py + '" -m pip install --no-warn-script-location "' +
                ExpandConstant('{app}\payload-cache\wheels\{#ShinestackerWheel}') + '"', PLog) <> 0 then Fails := Fails + 1;
 
   { 2. downloaded components }
@@ -304,14 +347,21 @@ begin
                  AppDir + '\external\Spinnaker\wheel\{#PySpinWheel}"', PLog) <> 0 then Fails := Fails + 1;
     if not DriverPresent then begin
       Status('Installing USB3 camera driver (administrator prompt)...');
-      if not ShellExec('runas', ExpandConstant('{sys}\cmd.exe'),
-          '/S /C "pnputil /add-driver "' + AppDir + '\external\Spinnaker\driver\PGRUsb3\PGRUSBCam3.inf" /install"',
-          '', SW_HIDE, ewWaitUntilTerminated, ResultCode) or (ResultCode <> 0) then begin
+      { elevation of a .cmd always yields a 64-bit cmd (spawned by the AppInfo
+        service), so %SystemRoot%\System32\pnputil.exe resolves correctly —
+        direct ShellExec of pnputil from the 32-bit setup fails on redirection }
+      SaveStringToFile(ExpandConstant('{tmp}\install_driver.cmd'),
+        '@echo off' + #13#10 +
+        '"%SystemRoot%\System32\pnputil.exe" /add-driver "' + AppDir +
+        '\external\Spinnaker\driver\PGRUsb3\PGRUSBCam3.inf" /install' + #13#10 +
+        'exit /b %errorlevel%' + #13#10, False);
+      if not ShellExec('runas', ExpandConstant('{tmp}\install_driver.cmd'), '', '',
+                       SW_HIDE, ewWaitUntilTerminated, ResultCode) or (ResultCode <> 0) then begin
         Fails := Fails + 1;
         Log('driver install failed or was declined, exit ' + IntToStr(ResultCode));
       end;
     end else
-      Log('USB3 driver already in driver store, skipping');
+      Log('USB3 driver already installed, skipping');
   end;
 
   if WizardIsComponentSelected('colmap') then begin
