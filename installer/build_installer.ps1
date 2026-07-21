@@ -60,10 +60,7 @@ $appDir = Join-Path $buildDir "app"
 Get-ChildItem "$appDir\external" -File | Where-Object {
     $_.Name -notin @("exiftool.exe", "cameraMakes.txt", "cameraSensors.txt")
 } | Remove-Item -Force
-# focus-stack: keep exe + runtime DLLs, drop Linux AppImage + debug artifacts
-Remove-Item "$appDir\external\focus-stack\focus-stack.AppImage",
-            "$appDir\external\focus-stack\focus-stack.pdb",
-            "$appDir\external\focus-stack\focus-stack.ilk" -Force -ErrorAction SilentlyContinue
+# focus-stack now comes from its payload (see step 2b), no longer in the app tree
 # internal docs / legacy / tests are not part of the shipped app
 foreach ($d in "docs", "legacy_scripts", "tests") {
     if (Test-Path "$appDir\$d") { Remove-Item "$appDir\$d" -Recurse -Force }
@@ -83,6 +80,12 @@ Copy-Item "$appDir\images\scAnt_icon.ico" (Join-Path $buildDir "scAnt_icon.ico")
 $elComp = Get-Component "env-lock"
 tar -xf (Get-PayloadZip $elComp) -C (Join-Path $buildDir "env-lock")
 if ($LASTEXITCODE -ne 0) { throw "env-lock extract failed" }
+
+# ---- 2b. focus-stack payload (embedded, mandatory with core) ----
+$fsComp = Get-Component "focus-stack"
+New-Item -ItemType Directory -Force (Join-Path $buildDir "focus-stack") | Out-Null
+tar -xf (Get-PayloadZip $fsComp) -C (Join-Path $buildDir "focus-stack")
+if ($LASTEXITCODE -ne 0) { throw "focus-stack extract failed" }
 
 # ---- 3. shinestacker payload: wheel embedded + LGPL source/notices carried ----
 $ssComp = Get-Component "shinestacker"

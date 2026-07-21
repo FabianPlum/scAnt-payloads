@@ -63,6 +63,7 @@ Name: "brush"; Description: "Gaussian-splat training — Brush v0.3.0"; Types: f
 [Files]
 Source: "build\app\*"; DestDir: "{app}\app"; Flags: recursesubdirs createallsubdirs ignoreversion; Components: core
 Source: "build\env-lock\*"; DestDir: "{app}\payload-cache\env-lock"; Flags: recursesubdirs createallsubdirs ignoreversion; Components: core
+Source: "build\focus-stack\*"; DestDir: "{app}\app\external\focus-stack"; Flags: recursesubdirs createallsubdirs ignoreversion; Components: core
 Source: "build\wheels\*"; DestDir: "{app}\payload-cache\wheels"; Flags: recursesubdirs createallsubdirs ignoreversion; Components: core
 Source: "build\third_party\*"; DestDir: "{app}\third_party_licenses"; Flags: recursesubdirs createallsubdirs ignoreversion; Components: core
 Source: "build\eula\FLIR_license.txt"; Flags: dontcopy
@@ -393,7 +394,7 @@ begin
   if RunHidden('"' + Py + '" -c "from shinestacker.algorithms import StackJob, PyramidStack, DepthMapStack, AlignFrames; print(''shinestacker OK'')"', SLog) <> 0 then Fails := Fails + 1;
   if RunHidden('"' + Py + '" -c "import cv2; cv2.ximgproc.createStructuredEdgeDetection(r''' + AppDir + '\scripts\model.yml''); print(''masking model OK'')"', SLog) <> 0 then Fails := Fails + 1;
   if RunHidden('"' + AppDir + '\external\exiftool.exe" -ver', SLog) <> 0 then Fails := Fails + 1;
-  if not FileExists(AppDir + '\external\focus-stack\focus-stack.exe') then Fails := Fails + 1;
+  if RunHidden('"' + AppDir + '\external\focus-stack\focus-stack.exe" --version', SLog) <> 0 then Fails := Fails + 1;
   if WizardIsComponentSelected('flir') then
     if RunHidden('"' + Py + '" -c "import PySpin; s=PySpin.System.GetInstance(); v=s.GetLibraryVersion(); print(''PySpin'', v.major, v.minor, v.type, v.build); c=s.GetCameras(); print(''cameras:'', c.GetSize()); c.Clear(); s.ReleaseInstance()"', SLog) <> 0 then Fails := Fails + 1;
   if WizardIsComponentSelected('colmap') then
