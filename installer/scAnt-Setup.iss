@@ -185,7 +185,9 @@ function ShouldSkipPage(PageID: Integer): Boolean;
 begin
   Result := False;
   if (EulaPage <> nil) and (PageID = EulaPage.ID) then
-    Result := not WizardIsComponentSelected('flir');
+    { silent installs skip the interactive page; the /EULAACCEPTED=1 gate in
+      PrepareToInstall enforces acceptance instead }
+    Result := WizardSilent or (not WizardIsComponentSelected('flir'));
 end;
 
 function NextButtonClick(CurPageID: Integer): Boolean;
