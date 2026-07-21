@@ -49,7 +49,8 @@ identification purposes only.
 
 ## Rebuilding a payload
 
-Each payload directory contains a `build_payload.ps1` that reproduces the
-archive from official Teledyne/upstream inputs on a machine that has them
-(see the script header for the expected inputs). The resulting zip's SHA-256
-must match the manifest pin.
+See [REPRODUCING.md](REPRODUCING.md) for the full process. Short version:
+each payload directory contains a `build_payload.ps1` plus an `inputs.json`
+pinning every upstream input by SHA-256; builds are content-reproducible
+(verified via the in-archive `SHA256SUMS.txt` — outer zip hashes differ per
+rebuild and are pinned in `manifest.json` per release).

@@ -1,0 +1,40 @@
+{
+  "payload": "flir-slim",
+  "outputVersion": "4.2.0.88",
+  "inputs": [
+    {
+      "artifact": "spinnaker_python-4.2.0.88-cp310-cp310-win_amd64.whl",
+      "sha256": "1aad909d35e8a82068c1033700bbc0cb98ac2591a472819add6867c6942b7e53",
+      "size": 36070600,
+      "source": "Teledyne Vision Solutions download portal (login required): Spinnaker SDK > archived versions > 4.2.0.88 > Python > Windows. Ships inside spinnaker_python-4.2.0.88-cp310-cp310-win_amd64.zip.",
+      "role": "wheel/ — PySpin + complete Spinnaker runtime"
+    },
+    {
+      "artifact": "Spinnaker SDK driver64/PGRUsb3 folder (from SpinnakerSDK_FULL_4.3.0.190_x64.exe install)",
+      "files": {
+        "PGRUSBCam3.inf": "a2046fcebdee62916e3654ac11a2c598a73ee844db9ed56ecb90a247a2560bc8",
+        "PGRUSBCam3.sys": "3fa5f24e3846a1ae76ff8f89b85032b500cefe5568527e2a4b1d98456b82f662",
+        "pgrusbcam3.cat": "b51cbda61f38c101682c8c1e0a0bcd78bd40e4943c7fd411604e2d5fa12953fb",
+        "WdfCoInstaller01009.dll": "ca9073af9442aba15ed46c1792586f1fa2e212c2a99f8f82f2e48e683e54bb73"
+      },
+      "driverVer": "05/06/2023, 2.7.3.640 (WHQL-signed)",
+      "source": "C:\\Program Files\\Teledyne\\Spinnaker\\driver64\\PGRUsb3 after installing the FULL SDK, or extract from the FULL exe. The same driver ships unchanged across SDK 4.x releases.",
+      "role": "driver/PGRUsb3/ — USB3 kernel driver"
+    },
+    {
+      "artifact": "spinnaker_python-4.3.0.190-cp310-cp310-win_amd64.zip",
+      "sha256": "c0f5da48222ed4e72a32064efa4f5805aa9ad7f27c9cebf985433dabbf1e4685",
+      "size": 57581216,
+      "source": "Teledyne Vision Solutions download portal (login required): Spinnaker SDK > 4.3.0.190 > Python > Windows.",
+      "role": "licenses/ — FLIR_license.txt, Spinnaker-Open-Source-Licenses.pdf, FFmpeg_compliance_doc.txt (extracted from its licenses/ folder; the license agreement is version-independent)"
+    },
+    {
+      "artifact": "LGPL-2.1.txt",
+      "sha256": "5749785c8bdefafcb5d798270ed0a967036fe2ca63dcedade1627565dfef81d2",
+      "source": "version-controlled in this directory (SPDX canonical text of LGPL-2.1)",
+      "role": "licenses/LGPL-2.1.txt — required because the wheel conveys LGPL-2.1 FFmpeg DLLs"
+    }
+  ],
+  "docs": "NOTICE.txt and README.md are version-controlled in this directory and staged into the archive root at build time.",
+  "build": "pwsh build_payload.ps1 -WheelPath <whl> -PySpinZip <zip> [-DriverDir <PGRUsb3 dir>]"
+}
