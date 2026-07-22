@@ -22,6 +22,7 @@ the **manifest**, per-payload **documentation/notices**, and the
 
 | Payload | Version | Contents | License |
 |---------|---------|----------|---------|
+| [`focus-stack`](payloads/focus-stack/) | 1.5 | official upstream focus-stack Windows build (default stacking backend; embedded in the installer as a mandatory part of core) | MIT |
 | [`flir-slim`](payloads/flir-slim/) | 4.2.0.88 (driver 2.7.3.640) | PySpin wheel (self-contained Spinnaker runtime) + WHQL-signed USB3 kernel driver + license texts | **proprietary — FLIR Spinnaker SDK License Agreement** |
 | [`env-lock`](payloads/env-lock/) | 2026.07.21 (micromamba 2.8.1-0) | micromamba + conda-lock/explicit lockfiles for the audited `scAnt_pro` env (win-64; conda packages stream from conda-forge at install time) | BSD-3-Clause (micromamba); lockfiles MIT |
 | [`shinestacker`](payloads/shinestacker/) | 1.15.0.post1.dev5 (upstream `fdea3546` + 2 patches) | patched focus-stacking wheel (headless, py3.10) + LGPL corresponding source + patches | **LGPL-3.0** |
@@ -58,3 +59,14 @@ each payload directory contains a `build_payload.ps1` plus an `inputs.json`
 pinning every upstream input by SHA-256; builds are content-reproducible
 (verified via the in-archive `SHA256SUMS.txt` — outer zip hashes differ per
 rebuild and are pinned in `manifest.json` per release).
+
+## Cutting a release
+
+See [RELEASING.md](RELEASING.md) — the post-merge workflow for shipping a
+new payload set and installer. Payload sets are built locally and tagged
+`v<payloadSet>` **here**; the `scAnt-Setup-<payloadSet>.exe` installer is
+then built by CI on the private
+[scAnt_pro](https://github.com/FabianPlum/scAnt_pro) repo (tag
+`installer-v<payloadSet>` triggers a draft release there), because the exe
+embeds the private app tree. Publishing the draft is gated on a manual
+install test.
