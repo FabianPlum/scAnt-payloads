@@ -84,7 +84,8 @@ var
   EulaPage: TOutputMsgMemoWizardPage;
   EulaAccept, EulaDecline: TNewRadioButton;
   GpuCudaOk: Boolean;
-  GpuVerdict: String;   { 'cuda' | 'no-nvidia' | 'old-driver' | 'unknown' }
+  GpuVerdict: String;   { 'cuda' | 'old-gpu' | 'old-driver' | 'unknown' }
+  GpuCC: String;        { detected compute capability, e.g. "6.1" (for dialogs) }
   DidPreselect: Boolean;
 
 { ---------- helpers ---------- }
@@ -145,6 +146,7 @@ begin
         D := Pos('.', Drvs);
         if D > 0 then Drvs := Copy(Drvs, 1, D - 1);
         DrvMaj := StrToIntDef(Drvs, 0);
+        GpuCC := CCs;
         if (CCMaj > 7) or ((CCMaj = 7) and (CCMin >= 5)) then begin
           if DrvMaj >= 580 then begin
             GpuCudaOk := True;
@@ -152,7 +154,9 @@ begin
           end else
             GpuVerdict := 'old-driver';
         end else
-          GpuVerdict := 'no-nvidia';
+          { nvidia-smi answered, so an NVIDIA GPU exists — it is just too old
+            for the CUDA build (pre-Turing, cc < 7.5); see scAnt_pro#14 }
+          GpuVerdict := 'old-gpu';
         Log('GPU gate: cc=' + CCs + ' driver=' + IntToStr(DrvMaj) + ' -> ' + GpuVerdict);
       end;
     end;
@@ -217,11 +221,21 @@ begin
                'but your NVIDIA driver is older than version 580.' + #13#10#13#10 +
                'Recommended: update the NVIDIA driver and select the CUDA build of COLMAP on the component page. ' +
                'The CPU/OpenGL build has been preselected for now.', mbInformation, MB_OK)
+      else if GpuVerdict = 'old-gpu' then
+        MsgBox('An NVIDIA GPU was detected, but it is too old for the bundled CUDA reconstruction build: ' +
+               'its compute capability is ' + GpuCC + ', while the CUDA build of COLMAP requires an NVIDIA GPU ' +
+               'of the Turing generation or newer (GeForce RTX 20-series / Quadro RTX or later, compute ' +
+               'capability 7.5+) and driver version 580 or newer.' + #13#10#13#10 +
+               'The CPU/OpenGL build has been preselected on purpose — please keep it. The CUDA build cannot ' +
+               'start on this GPU, and updating the NVIDIA driver will not change that.', mbInformation, MB_OK)
       else if GpuVerdict = 'unknown' then
         MsgBox('Your GPU could not be detected automatically.' + #13#10#13#10 +
-               'If this machine has an NVIDIA GPU (GeForce RTX / Turing or newer), please select the ' +
-               'CUDA build of COLMAP on the component page — it is strongly recommended and much faster. ' +
-               'The CPU/OpenGL build has been preselected as the safe default.', mbInformation, MB_OK);
+               'Select the CUDA build of COLMAP on the component page ONLY if this machine has an NVIDIA GPU ' +
+               'of the Turing generation or newer (GeForce RTX 20-series / Quadro RTX or later, compute ' +
+               'capability 7.5+) with driver version 580 or newer — then it is strongly recommended and much ' +
+               'faster.' + #13#10#13#10 +
+               'On older or non-NVIDIA GPUs the CUDA build will fail to start. The CPU/OpenGL build has been ' +
+               'preselected as the safe default.', mbInformation, MB_OK);
     end;
   end;
 end;
