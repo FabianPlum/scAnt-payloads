@@ -87,8 +87,10 @@ including app-only ones.
   version bump, or a change in installer behaviour.
 - **major** — `manifestVersion` schema change.
 
-Published tags so far: payloads `v0.1.0`, `v0.2.0`, `v0.3.0`, `v0.3.1`;
-installer `installer-v0.3.0`, `installer-v0.3.1`. **Next is `0.3.2`.**
+Published tags so far: payloads `v0.1.0` – `v0.4.0`; installer
+`installer-v0.3.0` – `installer-v0.4.0`. `0.4.0` is the first proper
+(non-pre-release, Latest) release; the `0.3.x` line was internal testing.
+**Next is `0.4.1`** (or `0.5.0` if a payload or installer behaviour changes).
 
 ## Step 3 — Rebuild payloads *(only if their inputs changed)*
 
