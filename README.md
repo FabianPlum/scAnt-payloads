@@ -33,6 +33,15 @@ v0.3.0** — are *not* mirrored here: the manifest pins their official GitHub
 release URLs + SHA-256 and the installer downloads them from upstream
 directly.
 
+## Separate items (not in the installer's payload set)
+
+Released here under their own tags, never under a `v*` payload-set tag, and
+not in `manifest.json`: the installer never downloads them.
+
+| Item | Version | Tag | Contents | License | Consumer |
+|------|---------|-----|----------|---------|----------|
+| [`colmap-clean`](payloads/colmap-clean/) | 4.1.1-1 | `colmap-clean-4.1.1-1` | COLMAP 4.1.1 built from source without its GPL, AGPL and non-commercial parts (no GUI/Qt, OpenGL, CGAL, LSD, SiftGPU or SuiteSparse GPL modules); CUDA PatchMatch, ALIKED + LightGlue on the CPU; with its build recipe | BSD-3-Clause; CHOLMOD and libquadmath LGPL-2.1-or-later (shared, unmodified) | scAnt_API's `tools/fetch_tools.py` |
+
 ## Licensing
 
 The scripts and documentation **in this repository** are MIT-licensed (see

@@ -1,0 +1,15 @@
+{
+  "payload": "colmap-clean",
+  "outputVersion": "4.1.1-1",
+  "inputs": [
+    {
+      "artifact": "the colmap-clean build folder (build/tools/build_colmap.py's output, <dest>/colmap-clean)",
+      "manifest_sha256": "b7906d8d3f55357d5e504fcbed077252323aa0251784cc92ae55c1c9f6c64909",
+      "executable_sha256": "7d731548bcf20e679f1f3287c25a433c907bc9b21f453405202b7a8246094f4d",
+      "source": "built 2026-10-17 from source by build/tools/build_colmap.py: COLMAP tag 4.1.1 at a0d785fba74b2664f31edc4a29026a8b27c00f67 with build/tools/colmap_patches, vcpkg at a0b1c8d3a477c1cb4813d8e127a56961707ca42b with build/tools/colmap_ports, MSVC 14.44.35207, CUDA 12.8; the ONNX models of COLMAP's release 3.13.0, pinned by sha256 in build/tools/pins.toml",
+      "role": "entire payload content except the docs, unmodified: bin/, licences/, models/, manifest.json, licence-proof.json"
+    }
+  ],
+  "docs": "README.md and NOTICE.txt are version-controlled here and staged into the archive root.",
+  "build": "pwsh build_payload.ps1 -BuildDir <dir>\\colmap-clean"
+}

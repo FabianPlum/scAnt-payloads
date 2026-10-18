@@ -1,0 +1,130 @@
+scAnt payload colmap-clean 4.1.1-1 (Windows x64) - third-party notices
+=========================================================================
+
+This archive holds COLMAP 4.1.1 (https://github.com/colmap/colmap, tag 4.1.1,
+commit a0d785fba74b2664f31edc4a29026a8b27c00f67), built from its sources for
+scAnt without COLMAP's GPL, AGPL and non-commercial parts. The recipe is in
+payloads/colmap-clean/build/ of https://github.com/FabianPlum/scAnt-payloads.
+Build of record: 2026-10-17, vcpkg a0b1c8d3a477c1cb4813d8e127a56961707ca42b,
+MSVC 14.44.35207, CUDA 12.8. manifest.json lists every file and its sha256;
+licence-proof.json holds the import tables that show what each binary links.
+
+Every component is named below with its licence. The full licence texts are
+in licences/<name>.txt (the name in brackets).
+
+1. COLMAP and what it compiles in (bin/colmap.exe)
+--------------------------------------------------
+- COLMAP 4.1.1 - BSD-3-Clause [colmap]. Built with the recipe's patch that
+  leaves out SiftGPU (an option); Ceres comes from the recipe's overlay port.
+- VLFeat (COLMAP's bundled copy, CPU SIFT) - BSD-2-Clause [vlfeat]
+- PoissonRecon (COLMAP's bundled copy) - MIT [poissonrecon]
+- PoseLib, commit fa7280fee27f97aff31ae7f98bab7f583fac7d08 - BSD-3-Clause
+  [poselib]
+- Faiss 1.14.1 - MIT [faiss]
+- Eigen 5.0.1 (header-only) - MPL-2.0; its sparse Cholesky and AMD parts are
+  MPL-2.0 too [eigen3]
+- Boost 1.91 headers - BSL-1.0 [boost-*]
+- NVIDIA CUDA runtime 12.8 (cudart_static.lib, linked statically) and the
+  CUDA kernels compiled for PatchMatch stereo - Copyright NVIDIA Corporation;
+  the CUDA runtime is distributable code under the NVIDIA CUDA Toolkit End
+  User License Agreement (https://docs.nvidia.com/cuda/eula/index.html).
+  [cuda] is vcpkg's port script for the toolkit (MIT), not NVIDIA's EULA.
+
+2. Shared libraries in bin/
+---------------------------
+- SuiteSparse 7.12.2: CHOLMOD 5.3.4 (cholmod.dll) - LGPL-2.1-or-later, its
+  Utility, Check, Cholesky, Camd and Partition modules only; the METIS and
+  GKlib copy inside it - Apache-2.0 [suitesparse-cholmod, metis, gklib].
+  See section 5 for its source.
+- SuiteSparse 7.12.2: AMD 3.3.4, CAMD 3.3.5, CCOLAMD 3.3.5, COLAMD 3.3.5,
+  SuiteSparse_config 7.12.2 (amd.dll, camd.dll, ccolamd.dll, colamd.dll,
+  suitesparseconfig.dll) - BSD-3-Clause [suitesparse-amd, -camd, -ccolamd,
+  -colamd, -config]
+- Ceres Solver 2.2.0 (ceres.dll) - BSD-3-Clause [ceres]
+- OpenBLAS 0.3.33 (openblas.dll) - BSD-3-Clause [openblas]
+- LAPACK reference 3.12.1 (liblapack.dll) - BSD-3-Clause [lapack-reference]
+- GCC 15.2.0 runtime, MSYS2 build 15.2.0-8 (libgcc_s_seh-1.dll,
+  libgfortran-5.dll) - GPL-3.0-or-later WITH GCC-exception-3.1, taken under
+  the GCC Runtime Library Exception [vcpkg-gfortran]
+- libquadmath from GCC 15.2.0, MSYS2 build 15.2.0-8 (libquadmath-0.dll) -
+  LGPL-2.1-or-later [vcpkg-gfortran]. See section 5 for its source.
+- MinGW-w64 winpthreads 13.0.0.r391.g848cce552 (libwinpthread-1.dll) -
+  MIT AND BSD-3-Clause [vcpkg-gfortran]
+- Boost 1.91 program_options (boost_program_options-vc143-mt-x64-1_91.dll) -
+  BSL-1.0 [boost-program-options]
+- OpenImageIO 3.1.14.0 (OpenImageIO.dll, OpenImageIO_Util.dll) - Apache-2.0
+  [openimageio]; robin-map 1.4.1 (header-only) - MIT [robin-map]
+- OpenColorIO 2.5.2 (OpenColorIO_2_5.dll) - BSD-3-Clause [opencolorio];
+  with pystring 1.1.5 - BSD-3-Clause [pystring] and minizip-ng 4.1.0 - Zlib
+  [minizip-ng], linked statically
+- OpenEXR 3.4.12 (OpenEXR-3_4.dll, OpenEXRCore-3_4.dll, Iex-3_4.dll,
+  IlmThread-3_4.dll) - BSD-3-Clause [openexr]
+- Imath 3.2.2 (Imath-3_2.dll) - BSD-3-Clause [imath]
+- ONNX Runtime 1.24.4, its CPU provider only (onnxruntime.dll) - MIT
+  [onnxruntime, onnxruntime-third-party-notices]. Its CUDA provider, which
+  needs NVIDIA's cuDNN, is not shipped: ALIKED and LightGlue run on the CPU.
+- libjpeg-turbo 3.1.4.1 (jpeg62.dll) - IJG AND BSD-3-Clause AND Zlib
+  [libjpeg-turbo]
+- libpng 1.6.58 (libpng16.dll) - libpng-2.0 [libpng]
+- libtiff 4.7.1 (tiff.dll) - libtiff [tiff]
+- OpenJPH 0.28.1 (openjph.0.28.dll) - BSD-2-Clause [openjph]
+- zlib 1.3.2 (z.dll) - Zlib [zlib]
+- xz / liblzma 5.8.3 (liblzma.dll) - 0BSD [liblzma]
+- bzip2 1.0.8 (bz2.dll) - bzip2-1.0.6 [bzip2]
+- Zstandard 1.5.7 (zstd.dll) - BSD-3-Clause OR GPL-2.0-only, taken under
+  BSD-3-Clause [zstd]
+- libdeflate 1.25 (deflate.dll) - MIT [libdeflate]
+- Expat 2.8.1 (libexpat.dll) - MIT [expat]
+- yaml-cpp 0.9.0 (yaml-cpp.dll) - MIT [yaml-cpp]
+- SQLite 3.53.2 (sqlite3.dll) - public domain (blessing) [sqlite3]
+- gflags 2.3.0 (gflags.dll) - BSD-3-Clause [gflags]
+- glog 0.7.1 (glog.dll) - BSD-3-Clause [glog]
+
+The Microsoft Visual C++ runtime (VCRUNTIME140*.dll, MSVCP140*.dll,
+VCOMP140.DLL) and the Windows system libraries are not shipped, as in
+COLMAP's own Windows build.
+
+3. Models in models/ (ONNX, from COLMAP's release 3.13.0, unmodified)
+---------------------------------------------------------------------
+- aliked-n16rot.onnx, aliked-n32.onnx: ALIKED weights - BSD-3-Clause
+  [model-aliked-n16rot, model-aliked-n32]
+- aliked-lightglue.onnx: LightGlue's ALIKED weights - Apache-2.0
+  [model-aliked-lightglue]
+- bruteforce-matcher.onnx: COLMAP's brute-force matcher graph, no trained
+  weights - BSD-3-Clause [model-bruteforce-matcher]
+COLMAP's download of models at run time is off: a run names these files
+(--AlikedExtraction.n16rot_model_path, --AlikedMatching.lightglue_model_path).
+
+4. In licences/ without a library of their own in bin/
+-----------------------------------------------------
+The build carries the licence of every port its vcpkg installed. No binary
+here imports a library of these ports (licence-proof.json); where one is
+header-only or static, its code may be compiled into the libraries above
+(fmt into OpenImageIO): fmt [fmt], GLEW [glew], OpenGL [opengl], the OpenGL
+and EGL registries (headers) [opengl-registry, egl-registry], JasPer
+[jasper], and vcpkg's helper ports, which build nothing [vcpkg-boost,
+vcpkg-cmake, vcpkg-cmake-config].
+
+5. Source for the LGPL libraries
+--------------------------------
+The two LGPL-2.1-or-later libraries are shipped as separate, unmodified
+shared libraries: you may replace either with your own build of it.
+
+- CHOLMOD 5.3.4 of SuiteSparse 7.12.2 (cholmod.dll):
+  https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v7.12.2.tar.gz
+  (SHA-512 0a7d070c90ef0a55c3ed821edf6567f4a84d5615250898b8fbacad19e1cf53db
+  a199c38369c771465b4149ba5501bf0c1ae1352f29d0fb462fd10ca90e486cfa), built by
+  vcpkg's port suitesparse-cholmod at vcpkg commit
+  a0b1c8d3a477c1cb4813d8e127a56961707ca42b, whose only patch changes the CMake
+  build's CUDA architectures, with the features core and partition.
+- libquadmath of GCC 15.2.0 (libquadmath-0.dll), MSYS2's build 15.2.0-8 of
+  the package mingw-w64-x86_64-gcc-libs: the source package
+  https://mirror.msys2.org/mingw/sources/mingw-w64-gcc-15.2.0-8.src.tar.zst
+  (GCC's upstream source: https://ftp.gnu.org/gnu/gcc/gcc-15.2.0/gcc-15.2.0.tar.xz).
+
+6. Left out of this build
+-------------------------
+COLMAP's GUI (Qt, LGPL-3.0) and OpenGL; CGAL (GPL-3.0, with GMP and MPFR);
+the line segment detector LSD (AGPL-3.0); SiftGPU (non-commercial); and
+SuiteSparse's GPL modules: SuiteSparseQR (SPQR) and CHOLMOD's Supernodal,
+MatrixOps, Modify and GPU modules (GPL-2.0-or-later).

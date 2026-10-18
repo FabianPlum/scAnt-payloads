@@ -1,0 +1,59 @@
+{
+  "name": "ceres",
+  "version": "2.2.0",
+  "port-version": 6,
+  "description": "non-linear optimization package; scAnt's overlay (tools/build_colmap.py): the suitesparse feature takes CHOLMOD without its GPL modules and no SuiteSparseQR",
+  "homepage": "https://github.com/ceres-solver/ceres-solver",
+  "license": "Apache-2.0",
+  "dependencies": [
+    "eigen3",
+    {
+      "name": "glog",
+      "platform": "!ios & !uwp"
+    },
+    {
+      "name": "vcpkg-cmake",
+      "host": true
+    },
+    {
+      "name": "vcpkg-cmake-config",
+      "host": true
+    }
+  ],
+  "features": {
+    "cuda": {
+      "description": "Support for CUDA based dense solvers",
+      "dependencies": [
+        "cuda"
+      ]
+    },
+    "eigensparse": {
+      "description": "Use of Eigen as a sparse linear algebra library in Ceres",
+      "dependencies": [
+        "metis"
+      ]
+    },
+    "lapack": {
+      "description": "Use Lapack in Ceres",
+      "dependencies": [
+        "lapack"
+      ]
+    },
+    "schur": {
+      "description": "Enable fixed-size Schur specializations in Ceres"
+    },
+    "suitesparse": {
+      "description": "SuiteSparse support for Ceres: CHOLMOD's LGPL modules (Core, Check, Cholesky, Camd, Partition), no SuiteSparseQR",
+      "dependencies": [
+        {
+          "name": "suitesparse-cholmod",
+          "default-features": false,
+          "features": [
+            "partition"
+          ]
+        },
+        "suitesparse-config"
+      ]
+    }
+  }
+}

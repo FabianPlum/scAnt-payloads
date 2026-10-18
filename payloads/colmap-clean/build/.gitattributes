@@ -1,0 +1,3 @@
+# The patches apply to sources with line feeds (COLMAP's checkout, vcpkg's extracted archives): they keep their line
+# feeds on every checkout, whatever core.autocrlf says.
+*.patch text eol=lf

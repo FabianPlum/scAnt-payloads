@@ -1,0 +1,146 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 046c2ec..899b994 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -344,10 +344,21 @@ if (SUITESPARSE)
+     #endif
+   ]] SuiteSparse_Partition_FOUND)
+   endblock()
+-  find_package(SPQR CONFIG REQUIRED)
++  # SuiteSparseQR (SPQR, GPL-2.0-or-later) is optional: without it Ceres keeps
++  # CHOLMOD's sparse Cholesky and leaves out only the covariance's SPARSE_QR
++  # with SUITE_SPARSE (CERES_NO_SUITESPARSE_QR; EIGEN_SPARSE stays).
++  option(SUITESPARSE_QR "Use SuiteSparseQR (SPQR, GPL-2.0-or-later)." ON)
++  if (SUITESPARSE_QR)
++    find_package(SPQR CONFIG REQUIRED)
++    set(SuiteSparse_QR_DEPENDENCY "\nfind_dependency(SPQR CONFIG)")
++  else (SUITESPARSE_QR)
++    message("-- Building without SuiteSparseQR (SPQR).")
++    list(APPEND CERES_COMPILE_OPTIONS CERES_NO_SUITESPARSE_QR)
++    set(SuiteSparse_QR_DEPENDENCY "")
++  endif (SUITESPARSE_QR)
+   find_package(SuiteSparse NAMES SuiteSparse_config REQUIRED)
+   if (SuiteSparse_FOUND)
+-    set(SuiteSparse_DEPENDENCY "find_dependency(CHOLMOD CONFIG)\nfind_dependency(SPQR CONFIG)")
++    set(SuiteSparse_DEPENDENCY "find_dependency(CHOLMOD CONFIG)${SuiteSparse_QR_DEPENDENCY}")
+     # By default, if all of SuiteSparse's dependencies are found, Ceres is
+     # built with SuiteSparse support.
+     message("-- Found SuiteSparse ${SuiteSparse_VERSION}, "
+diff --git a/cmake/config.h.in b/cmake/config.h.in
+index 0e7fd3a..f4fe8f6 100644
+--- a/cmake/config.h.in
++++ b/cmake/config.h.in
+@@ -50,6 +50,10 @@
+ // If defined, Ceres was compiled without SuiteSparse.
+ @CERES_NO_SUITESPARSE@
+ 
++// If defined, Ceres was compiled with SuiteSparse but without SuiteSparseQR
++// (SPQR): the covariance's SPARSE_QR runs on EIGEN_SPARSE only.
++@CERES_NO_SUITESPARSE_QR@
++
+ // If defined, Ceres was compiled without CUDA.
+ @CERES_NO_CUDA@
+ 
+diff --git a/include/ceres/covariance.h b/include/ceres/covariance.h
+index d477f31..61a339f 100644
+--- a/include/ceres/covariance.h
++++ b/include/ceres/covariance.h
+@@ -207,7 +207,7 @@ class CERES_EXPORT Covariance {
+     //
+     // Currently this only applies to SPARSE_QR.
+     SparseLinearAlgebraLibraryType sparse_linear_algebra_library_type =
+-#if !defined(CERES_NO_SUITESPARSE)
++#if !defined(CERES_NO_SUITESPARSE) && !defined(CERES_NO_SUITESPARSE_QR)
+         SUITE_SPARSE;
+ #else
+         // Eigen's QR factorization is always available.
+diff --git a/internal/ceres/CMakeLists.txt b/internal/ceres/CMakeLists.txt
+index a5ef6f8..5ab9c3e 100644
+--- a/internal/ceres/CMakeLists.txt
++++ b/internal/ceres/CMakeLists.txt
+@@ -100,8 +100,10 @@ endif (NOT MINIGLOG AND GLOG_FOUND)
+ if (SUITESPARSE AND SuiteSparse_FOUND)
+   # Define version information for use in Solver::FullReport.
+   add_definitions(-DCERES_SUITESPARSE_VERSION="${SuiteSparse_VERSION}")
+-  list(APPEND CERES_LIBRARY_PRIVATE_DEPENDENCIES SuiteSparse::CHOLMOD
+-    SuiteSparse::SPQR)
++  list(APPEND CERES_LIBRARY_PRIVATE_DEPENDENCIES SuiteSparse::CHOLMOD)
++  if (SUITESPARSE_QR)
++    list(APPEND CERES_LIBRARY_PRIVATE_DEPENDENCIES SuiteSparse::SPQR)
++  endif (SUITESPARSE_QR)
+ 
+   if (SuiteSparse_Partition_FOUND)
+   endif (SuiteSparse_Partition_FOUND)
+diff --git a/internal/ceres/covariance_impl.cc b/internal/ceres/covariance_impl.cc
+index deb0ce1..b1d8304 100644
+--- a/internal/ceres/covariance_impl.cc
++++ b/internal/ceres/covariance_impl.cc
+@@ -536,7 +536,7 @@ bool CovarianceImpl::ComputeCovarianceValuesUsingSuiteSparseQR() {
+   EventLogger event_logger(
+       "CovarianceImpl::ComputeCovarianceValuesUsingSparseQR");
+ 
+-#ifndef CERES_NO_SUITESPARSE
++#if !defined(CERES_NO_SUITESPARSE) && !defined(CERES_NO_SUITESPARSE_QR)
+   if (covariance_matrix_ == nullptr) {
+     // Nothing to do, all zeros covariance matrix.
+     return true;
+@@ -694,11 +694,15 @@ bool CovarianceImpl::ComputeCovarianceValuesUsingSuiteSparseQR() {
+   event_logger.AddEvent("Inversion");
+   return true;
+ 
+-#else  // CERES_NO_SUITESPARSE
++#else  // CERES_NO_SUITESPARSE || CERES_NO_SUITESPARSE_QR
+ 
++  LOG(ERROR) << "This build of Ceres has no SuiteSparseQR: use the SPARSE_QR "
++             << "algorithm with "
++             << "Covariance::Options::sparse_linear_algebra_library_type "
++             << "= EIGEN_SPARSE, or DENSE_SVD.";
+   return false;
+ 
+-#endif  // CERES_NO_SUITESPARSE
++#endif  // CERES_NO_SUITESPARSE || CERES_NO_SUITESPARSE_QR
+ }
+ 
+ bool CovarianceImpl::ComputeCovarianceValuesUsingDenseSVD() {
+diff --git a/internal/ceres/suitesparse.h b/internal/ceres/suitesparse.h
+index 703ee87..e7de51d 100644
+--- a/internal/ceres/suitesparse.h
++++ b/internal/ceres/suitesparse.h
+@@ -43,7 +43,9 @@
+ #include <string>
+ #include <vector>
+ 
++#ifndef CERES_NO_SUITESPARSE_QR
+ #include "SuiteSparseQR.hpp"
++#endif
+ #include "ceres/block_structure.h"
+ #include "ceres/internal/disable_warnings.h"
+ #include "ceres/linear_solver.h"
+@@ -96,9 +98,11 @@ class CERES_NO_EXPORT SuiteSparse {
+   // CHOLMOD_COL for column scaling - A * diag(scale) and CHOLMOD_SYM
+   // for symmetric scaling which scales both the rows and the columns
+   // - diag(scale) * A * diag(scale).
++#ifndef NMATRIXOPS  // CHOLMOD's MatrixOps module (GPL-2.0-or-later)
+   void Scale(cholmod_dense* scale, int mode, cholmod_sparse* A) {
+     cholmod_scale(scale, mode, A, &cc_);
+   }
++#endif
+ 
+   // Create and return a matrix m = A * A'. Caller owns the
+   // result. The matrix A is not modified.
+@@ -108,6 +112,7 @@ class CERES_NO_EXPORT SuiteSparse {
+     return m;
+   }
+ 
++#ifndef NMATRIXOPS  // CHOLMOD's MatrixOps module (GPL-2.0-or-later)
+   // y = alpha * A * x + beta * y. Only y is modified.
+   void SparseDenseMultiply(cholmod_sparse* A,
+                            double alpha,
+@@ -118,6 +123,7 @@ class CERES_NO_EXPORT SuiteSparse {
+     double beta_[2] = {beta, 0};
+     cholmod_sdmult(A, 0, alpha_, beta_, x, y, &cc_);
+   }
++#endif
+ 
+   // Compute a symbolic factorization for A or AA' (if A is
+   // unsymmetric). If ordering_type is NATURAL, then no fill reducing

@@ -1,0 +1,72 @@
+# An excerpt of scAnt_API's tools/pins.toml at main f7853f13: the [tools.colmap-clean] tables that
+# tools/build_colmap.py reads (the sources' commits, the toolset, the layout, the ONNX models), copied unchanged with
+# scAnt_API's comments. The archive's own address and digest are pinned in scAnt_API, not here.
+
+[tools.colmap-clean]
+# TEMPORARY (docs/phases/p5b.md, E7, stage 1): COLMAP 4.1.1 built by the repository without its GPL, AGPL and
+# non-commercial parts, beside [tools.colmap], which the product's steps still use; stage 5 switches the product's pin
+# to this build and deletes this mark. Built, not fetched: tools/build_colmap.py (its docstring says how) from COLMAP's
+# tag 4.1.1 at colmap_commit with tools/colmap_patches (SIFT_GPU_ENABLED=OFF: no SiftGPU, CUDA stays for PatchMatch;
+# SIFT with use_gpu fails its option check), vcpkg at vcpkg_commit (COLMAP 4.1.1's own baseline) with the overlay port
+# tools/colmap_ports/ceres (Ceres 2.2.0 on CHOLMOD's LGPL modules, no SuiteSparseQR), MSVC msvc and CUDA cuda. No GUI
+# (no Qt, no OpenGL), no CGAL, no LSD, no downloads at run time; ONNX Runtime (MIT) for ALIKED and LightGlue, on the
+# processor (its CUDA provider, which needs cuDNN, is not shipped). Licences: BSD-3-Clause, its libraries in
+# env/README.md ("colmap-clean's libraries"; LGPL-2.1-or-later CHOLMOD and LGPL-3.0 none else: shared, unmodified),
+# no GPL, AGPL or non-commercial part; licence-proof.json of the build lists the import tables that show it.
+# The bytes are not reproducible (no /Brepro): manifest_sha256 (its manifest.json: every file's sha256) and
+# executable_sha256 name the build of record, which the build prints the lines for.
+version = "4.1.1"
+build = "tools/build_colmap.py"
+colmap_commit = "a0d785fba74b2664f31edc4a29026a8b27c00f67"
+vcpkg_commit = "a0b1c8d3a477c1cb4813d8e127a56961707ca42b"
+msvc = "14.44.35207"
+cuda = "12.8"
+# Turing to Blackwell (the scAnt-payloads gate: compute capability 7.5 or higher), with Blackwell's PTX for later cards.
+cuda_architectures = "75-real;80-real;86-real;89-real;90-real;120-real;120-virtual"
+install_dir = "colmap-clean"
+executable = "bin/colmap.exe"
+reports_version = "4.1.1"
+# The build of record (2026-10-17, P5b E7 stage 1: vcpkg 17 min, COLMAP 11 min on this PC; 155 MB, 38 files in bin/).
+manifest_sha256 = "b7906d8d3f55357d5e504fcbed077252323aa0251784cc92ae55c1c9f6c64909"
+executable_sha256 = "7d731548bcf20e679f1f3287c25a433c907bc9b21f453405202b7a8246094f4d"
+
+# The ONNX models COLMAP 4.1.1 names by default (src/colmap/feature/resources.h: its 3.13.0 release's files and their
+# sha256), fetched by the build into models/ (DOWNLOAD_ENABLED is off: a run gives the paths). Their licences are the
+# weights' upstream ones (ALIKED BSD-3-Clause, LightGlue's ALIKED weights Apache-2.0; COLMAP's export repositories
+# colmap/ALIKED-ONNX BSD-3-Clause and colmap/LightGlue-ONNX Apache-2.0), each text pinned at a commit. Not SuperPoint.
+[tools.colmap-clean.weights.aliked-n16rot]
+file = "aliked-n16rot.onnx"
+url = "https://github.com/colmap/colmap/releases/download/3.13.0/aliked-n16rot.onnx"
+sha256 = "39c423d0a6f03d39ec89d3d1d61853765c2fb6a8b8381376c703e5758778a547"
+size_bytes = 2997054
+licence = "BSD-3-Clause"
+licence_url = "https://raw.githubusercontent.com/Shiaoming/ALIKED/635ddfafaca4312f40db5e5860879c6a271ce5a6/LICENSE"
+licence_sha256 = "c48ae933e262f77087a1956ae95f4675bfe20895b52fb328eed5b4e11d477bfb"
+
+[tools.colmap-clean.weights.aliked-n32]
+file = "aliked-n32.onnx"
+url = "https://github.com/colmap/colmap/releases/download/3.13.0/aliked-n32.onnx"
+sha256 = "a077728a02d2de1a775c66df6de8cfeb7c6b51ca57572c64c680131c988c8b3c"
+size_bytes = 4205634
+licence = "BSD-3-Clause"
+licence_url = "https://raw.githubusercontent.com/Shiaoming/ALIKED/635ddfafaca4312f40db5e5860879c6a271ce5a6/LICENSE"
+licence_sha256 = "c48ae933e262f77087a1956ae95f4675bfe20895b52fb328eed5b4e11d477bfb"
+
+[tools.colmap-clean.weights.aliked-lightglue]
+file = "aliked-lightglue.onnx"
+url = "https://github.com/colmap/colmap/releases/download/3.13.0/aliked-lightglue.onnx"
+sha256 = "b9a5de7204648b18a8cf5dcac819f9d30de1a5961ef03756803c8b86c2dceb8d"
+size_bytes = 45804950
+licence = "Apache-2.0"
+licence_url = "https://raw.githubusercontent.com/cvg/LightGlue/fd12dd7289b678a387e1170e84ae1c4e7574aa92/LICENSE"
+licence_sha256 = "0e6031ed3e62dc91dc8b1c8f240abd200b1083f60773362e64e339fe01d1bf18"
+
+# COLMAP's own brute-force matcher for ALIKED's descriptors as an ONNX graph (no trained weights): COLMAP's licence.
+[tools.colmap-clean.weights.bruteforce-matcher]
+file = "bruteforce-matcher.onnx"
+url = "https://github.com/colmap/colmap/releases/download/3.13.0/bruteforce-matcher.onnx"
+sha256 = "3c1282f96d83f5ffc861a873298d08bbe5219f59af59223f5ceab5c41a182a47"
+size_bytes = 5014
+licence = "BSD-3-Clause"
+licence_url = "https://raw.githubusercontent.com/colmap/colmap/a0d785fba74b2664f31edc4a29026a8b27c00f67/COPYING.txt"
+licence_sha256 = "ab30dabb4f0a6731f980108f57aa160cc8f5cebae6984e01a5d109df99669233"

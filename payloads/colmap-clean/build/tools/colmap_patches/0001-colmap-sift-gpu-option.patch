@@ -1,0 +1,226 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index da2f3797..a8f86c72 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -52,6 +52,7 @@ option(WERROR_ENABLED "Whether to treat compiler warnings as errors" OFF)
+ option(CCACHE_ENABLED "Whether to enable compiler caching, if available" ON)
+ option(CGAL_ENABLED "Whether to enable the CGAL library" ON)
+ option(LSD_ENABLED "Whether to enable the LSD library" ON)
++option(SIFT_GPU_ENABLED "Whether to build SiftGPU (non-commercial licence) for SIFT on the GPU" ON)
+ option(DOWNLOAD_ENABLED "Whether to enable (automatic) download of resources (requires Curl/OpenSSL)" ON)
+ option(UNINSTALL_ENABLED "Whether to create a target to 'uninstall' colmap" ON)
+ option(BENCHMARK_ENABLED "Whether to enable runtime benchmarking support" OFF)
+@@ -323,7 +324,9 @@ if(LSD_ENABLED)
+     COLMAP_ADD_SOURCE_DIR(src/thirdparty/LSD THIRDPARTY_LSD_SRCS *.h *.c)
+ endif()
+ COLMAP_ADD_SOURCE_DIR(src/thirdparty/PoissonRecon THIRDPARTY_POISSON_RECON_SRCS *.h *.cpp *.inl)
+-COLMAP_ADD_SOURCE_DIR(src/thirdparty/SiftGPU THIRDPARTY_SIFT_GPU_SRCS *.h *.cpp *.cu)
++if(SIFT_GPU_ENABLED)
++    COLMAP_ADD_SOURCE_DIR(src/thirdparty/SiftGPU THIRDPARTY_SIFT_GPU_SRCS *.h *.cpp *.cu)
++endif()
+ COLMAP_ADD_SOURCE_DIR(src/thirdparty/VLFeat THIRDPARTY_VLFEAT_SRCS *.h *.c *.tc)
+ 
+ # Add all of the source files to a regular library target, as using a custom
+@@ -448,7 +451,7 @@ if(CUDA_ENABLED)
+         list(APPEND COLMAP_EXPORT_LIBS colmap_mvs_cuda)
+     endif()
+ endif()
+-if(GPU_ENABLED)
++if(SIFT_GPU_BUILT)
+     list(APPEND COLMAP_EXPORT_LIBS
+          colmap_sift_gpu
+     )
+diff --git a/cmake/FindDependencies.cmake b/cmake/FindDependencies.cmake
+index e0cae43b..686940b1 100644
+--- a/cmake/FindDependencies.cmake
++++ b/cmake/FindDependencies.cmake
+@@ -519,3 +519,12 @@ if(OPENGL_ENABLED OR CUDA_ENABLED)
+     message(STATUS "Enabling GPU support (OpenGL: ${OPENGL_ENABLED}, CUDA: ${CUDA_ENABLED})")
+     set(GPU_ENABLED ON)
+ endif()
++
++set(SIFT_GPU_BUILT OFF)
++if(GPU_ENABLED AND SIFT_GPU_ENABLED)
++    list(APPEND COLMAP_COMPILE_DEFINITIONS COLMAP_SIFT_GPU_ENABLED)
++    message(STATUS "Enabling SiftGPU")
++    set(SIFT_GPU_BUILT ON)
++else()
++    message(STATUS "Disabling SiftGPU: SIFT runs on the CPU (VLFeat) only")
++endif()
+diff --git a/src/colmap/feature/CMakeLists.txt b/src/colmap/feature/CMakeLists.txt
+index 56b44452..98a8b02e 100644
+--- a/src/colmap/feature/CMakeLists.txt
++++ b/src/colmap/feature/CMakeLists.txt
+@@ -70,7 +70,7 @@ COLMAP_ADD_LIBRARY(
+         faiss
+ )
+ 
+-if(GPU_ENABLED)
++if(SIFT_GPU_BUILT)
+     target_link_libraries(colmap_feature PRIVATE colmap_sift_gpu)
+     if(NOT GUI_ENABLED)
+         target_link_libraries(colmap_feature PRIVATE GLEW::GLEW)
+diff --git a/src/colmap/feature/extractor.cc b/src/colmap/feature/extractor.cc
+index f6326c3e..db269634 100644
+--- a/src/colmap/feature/extractor.cc
++++ b/src/colmap/feature/extractor.cc
+@@ -142,6 +142,15 @@ bool FeatureExtractionOptions::Check() const {
+     return false;
+ #endif
+   }
++#if !defined(COLMAP_SIFT_GPU_ENABLED)
++  if (use_gpu && type == FeatureExtractorType::SIFT && !sift->estimate_affine_shape &&
++      !sift->domain_size_pooling && !sift->force_covariant_extractor) {
++    LOG(ERROR) << "SIFT feature extraction on the GPU needs SiftGPU, which this "
++                  "build leaves out (SIFT_GPU_ENABLED=OFF): set use_gpu to false "
++                  "for SIFT on the CPU.";
++    return false;
++  }
++#endif
+   switch (type) {
+     case FeatureExtractorType::SIFT:
+       return THROW_CHECK_NOTNULL(sift)->Check();
+diff --git a/src/colmap/feature/extractor.h b/src/colmap/feature/extractor.h
+index dc1a5032..06034c82 100644
+--- a/src/colmap/feature/extractor.h
++++ b/src/colmap/feature/extractor.h
+@@ -69,7 +69,7 @@ struct FeatureExtractionOptions : public FeatureExtractionTypeOptions {
+   int num_threads = -1;
+ 
+   // Whether to use the GPU for feature extraction.
+-#ifdef COLMAP_GPU_ENABLED
++#if defined(COLMAP_GPU_ENABLED) && defined(COLMAP_SIFT_GPU_ENABLED)
+   bool use_gpu = true;
+ #else
+   bool use_gpu = false;
+diff --git a/src/colmap/feature/matcher.cc b/src/colmap/feature/matcher.cc
+index 6b6d63b9..01794e0f 100644
+--- a/src/colmap/feature/matcher.cc
++++ b/src/colmap/feature/matcher.cc
+@@ -108,6 +108,14 @@ bool FeatureMatchingOptions::Check() const {
+     return false;
+ #endif
+   }
++#if !defined(COLMAP_SIFT_GPU_ENABLED)
++  if (use_gpu && type == FeatureMatcherType::SIFT_BRUTEFORCE) {
++    LOG(ERROR) << "SIFT brute-force matching on the GPU needs SiftGPU, which "
++                  "this build leaves out (SIFT_GPU_ENABLED=OFF): set use_gpu to "
++                  "false for SIFT matching on the CPU.";
++    return false;
++  }
++#endif
+   CHECK_OPTION_GE(max_num_matches, 0);
+   switch (type) {
+     case FeatureMatcherType::SIFT_BRUTEFORCE:
+diff --git a/src/colmap/feature/matcher.h b/src/colmap/feature/matcher.h
+index 2e22a37e..30ddc172 100644
+--- a/src/colmap/feature/matcher.h
++++ b/src/colmap/feature/matcher.h
+@@ -67,7 +67,7 @@ struct FeatureMatchingOptions : public FeatureMatchingTypeOptions {
+   int num_threads = -1;
+ 
+   // Whether to use the GPU for feature matching.
+-#ifdef COLMAP_GPU_ENABLED
++#if defined(COLMAP_GPU_ENABLED) && defined(COLMAP_SIFT_GPU_ENABLED)
+   bool use_gpu = true;
+ #else
+   bool use_gpu = false;
+diff --git a/src/colmap/feature/sift.cc b/src/colmap/feature/sift.cc
+index 4554cb89..a221a824 100644
+--- a/src/colmap/feature/sift.cc
++++ b/src/colmap/feature/sift.cc
+@@ -38,13 +38,13 @@
+ #include "colmap/util/opengl_utils.h"
+ #include "colmap/util/string.h"
+ 
+-#if defined(COLMAP_GPU_ENABLED)
++#if defined(COLMAP_SIFT_GPU_ENABLED)
+ #include "thirdparty/SiftGPU/SiftGPU.h"
+ #if !defined(COLMAP_GUI_ENABLED)
+ // GLEW symbols are already defined by Qt.
+ #include <GL/glew.h>
+ #endif  // COLMAP_GUI_ENABLED
+-#endif  // COLMAP_GPU_ENABLED
++#endif  // COLMAP_SIFT_GPU_ENABLED
+ #include "colmap/util/eigen_alignment.h"
+ 
+ #include "thirdparty/VLFeat/covdet.h"
+@@ -547,7 +547,7 @@ class CovariantSiftCPUFeatureExtractor : public FeatureExtractor {
+   const FeatureExtractionOptions options_;
+ };
+ 
+-#if defined(COLMAP_GPU_ENABLED)
++#if defined(COLMAP_SIFT_GPU_ENABLED)
+ // Mutexes that ensure that only one thread extracts/matches on the same GPU
+ // at the same time, since SiftGPU internally uses static variables.
+ static std::map<int, std::unique_ptr<std::mutex>> sift_gpu_mutexes_;
+@@ -741,7 +741,7 @@ class SiftGPUFeatureExtractor : public FeatureExtractor {
+   SiftGPU sift_gpu_;
+   std::vector<SiftKeypoint> keypoints_buffer_;
+ };
+-#endif  // COLMAP_GPU_ENABLED
++#endif  // COLMAP_SIFT_GPU_ENABLED
+ 
+ }  // namespace
+ 
+@@ -753,12 +753,12 @@ std::unique_ptr<FeatureExtractor> CreateSiftFeatureExtractor(
+     LOG(INFO) << "Creating Covariant SIFT CPU feature extractor";
+     return CovariantSiftCPUFeatureExtractor::Create(options);
+   } else if (options.use_gpu) {
+-#if defined(COLMAP_GPU_ENABLED)
++#if defined(COLMAP_SIFT_GPU_ENABLED)
+     LOG(INFO) << "Creating SIFT GPU feature extractor";
+     return SiftGPUFeatureExtractor::Create(options);
+ #else
+     return nullptr;
+-#endif  // COLMAP_GPU_ENABLED
++#endif  // COLMAP_SIFT_GPU_ENABLED
+   } else {
+     LOG(INFO) << "Creating SIFT CPU feature extractor";
+     return SiftCPUFeatureExtractor::Create(options);
+@@ -1246,7 +1246,7 @@ class SiftCPUFeatureMatcher : public FeatureMatcher {
+   std::shared_ptr<FeatureDescriptorIndex> index2_;
+ };
+ 
+-#if defined(COLMAP_GPU_ENABLED)
++#if defined(COLMAP_SIFT_GPU_ENABLED)
+ // Mutexes for OpenGL version to protect static variables in SiftGPU.
+ // CUDA version doesn't need this as it has its own thread safety.
+ static std::map<int, std::unique_ptr<std::mutex>> sift_opengl_mutexes_;
+@@ -1544,7 +1544,7 @@ class SiftGPUFeatureMatcher : public FeatureMatcher {
+   image_t prev_image_id1_ = kInvalidImageId;
+   image_t prev_image_id2_ = kInvalidImageId;
+ };
+-#endif  // COLMAP_GPU_ENABLED
++#endif  // COLMAP_SIFT_GPU_ENABLED
+ 
+ }  // namespace
+ 
+@@ -1555,12 +1555,12 @@ std::unique_ptr<FeatureMatcher> CreateSiftFeatureMatcher(
+     return CreateLightGlueONNXFeatureMatcher(options, options.sift->lightglue);
+   } else if (options.type == FeatureMatcherType::SIFT_BRUTEFORCE) {
+     if (options.use_gpu) {
+-#ifdef COLMAP_GPU_ENABLED
++#ifdef COLMAP_SIFT_GPU_ENABLED
+       LOG(INFO) << "Creating SIFT GPU feature matcher";
+       return SiftGPUFeatureMatcher::Create(options);
+ #else
+       return nullptr;
+-#endif  // COLMAP_GPU_ENABLED
++#endif  // COLMAP_SIFT_GPU_ENABLED
+     } else {
+       LOG(INFO) << "Creating SIFT CPU feature matcher";
+       return SiftCPUFeatureMatcher::Create(options);
+diff --git a/src/thirdparty/CMakeLists.txt b/src/thirdparty/CMakeLists.txt
+index 48eb5297..98593acc 100644
+--- a/src/thirdparty/CMakeLists.txt
++++ b/src/thirdparty/CMakeLists.txt
+@@ -25,7 +25,7 @@ if(LSD_ENABLED)
+     add_subdirectory(LSD)
+ endif()
+ add_subdirectory(PoissonRecon)
+-if(GPU_ENABLED)
++if(SIFT_GPU_BUILT)
+     add_subdirectory(SiftGPU)
+ endif()
+ add_subdirectory(VLFeat)
