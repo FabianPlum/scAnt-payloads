@@ -71,6 +71,18 @@ Source: "build\eula\FLIR_license.txt"; Flags: dontcopy
 [Icons]
 Name: "{userprograms}\scAnt"; Filename: "{app}\env\python.exe"; Parameters: "scAnt.py"; WorkingDir: "{app}\app"; IconFilename: "{app}\app\images\scAnt_icon.ico"; Comment: "scAnt 3D scanner"
 
+[InstallDelete]
+; An install over an earlier version: sources that releases before 1.0.0 shipped and that no longer ship (firmware,
+; rig_stack's native code). Only these paths, never the whole app folder: projects may be saved inside it.
+Type: filesandordirs; Name: "{app}\app\scripts\Arduino_Control"
+Type: filesandordirs; Name: "{app}\app\scripts\SKR_Control"
+Type: filesandordirs; Name: "{app}\app\scripts\rigstack\native\src"
+Type: filesandordirs; Name: "{app}\app\scripts\rigstack\native\include"
+Type: filesandordirs; Name: "{app}\app\scripts\rigstack\native\tests"
+Type: files; Name: "{app}\app\scripts\rigstack\native\CMakeLists.txt"
+Type: files; Name: "{app}\app\scripts\rigstack\native\README.md"
+Type: files; Name: "{app}\app\scripts\rigstack\README.md"
+
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\env"
 Type: filesandordirs; Name: "{app}\payload-cache"
