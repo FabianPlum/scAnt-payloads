@@ -1,0 +1,142 @@
+#!/bin/bash
+# postinstall of scAnt-Setup-<version>-macos-arm64.pkg (a per-user package: the Installer runs this as the user who
+# installs, with $2 = the folder the package put its files in, ~/Library/scAnt/payload-cache/pkg-setup). It runs the
+# same installer as scAnt-Setup-<version>-macos-arm64.sh (setup.sh in that folder) and asks its questions in dialogs:
+# FLIR camera support (Teledyne's own Spinnaker pkg or dmg, found in Downloads or chosen, and Teledyne's licence,
+# opened in TextEdit for reading). Everything it prints goes to ~/Library/scAnt/install-pkg.log.
+#
+# Unattended installs (installer -pkg <pkg> -target CurrentUserHomeDirectory): with ~/Library/scAnt/setup-answers.txt
+# there are no dialogs. Its lines: flir=<path to Teledyne's Spinnaker pkg or dmg> or flir=none, and
+# accept-flir-license=yes (needed with a flir= path: you accept the FLIR Spinnaker SDK License Agreement).
+SETUP_DIR="$2"
+LOG="$HOME/Library/scAnt/install-pkg.log"
+mkdir -p "$HOME/Library/scAnt"
+exec >> "$LOG" 2>&1
+echo ""
+echo "=== scAnt Setup package postinstall, $(date '+%Y-%m-%d %H:%M:%S'), setup files in $SETUP_DIR"
+[ "$(id -u)" != 0 ] || { echo "running as root: this package installs for the current user only"; exit 1; }
+[ -f "$SETUP_DIR/setup.sh" ] && [ -f "$SETUP_DIR/pins.sh" ] || { echo "setup files missing in $SETUP_DIR"; exit 1; }
+. "$SETUP_DIR/pins.sh"
+TITLE="scAnt Setup $SCANT_VERSION"
+
+ask() { # ask "text" "button 1" "button 2" (default, the right one) -> the button pressed ("" if unanswered)
+    osascript - "$1" "$2" "$3" "$TITLE" <<'EOF' 2>/dev/null
+on run argv
+    activate
+    try
+        set r to display dialog (item 1 of argv) buttons {item 2 of argv, item 3 of argv} default button 2 with title (item 4 of argv) with icon note giving up after 900
+        if gave up of r then return ""
+        return button returned of r
+    on error
+        return ""
+    end try
+end run
+EOF
+}
+tell() { # tell "text": a dialog with OK
+    osascript - "$1" "$TITLE" <<'EOF' >/dev/null 2>&1
+on run argv
+    activate
+    display dialog (item 1 of argv) buttons {"OK"} default button 1 with title (item 2 of argv) with icon note giving up after 600
+end run
+EOF
+}
+
+# ---- FLIR camera support: Teledyne's file and licence -------------------------------------------------------------
+FLIR=""
+ANSWERS="$HOME/Library/scAnt/setup-answers.txt"
+UNATTENDED=no
+if [ -f "$ANSWERS" ]; then
+    UNATTENDED=yes
+    echo "answers from $ANSWERS"
+    a_flir=$(sed -n 's/^flir=//p' "$ANSWERS" | tail -1)
+    a_accept=$(sed -n 's/^accept-flir-license=//p' "$ANSWERS" | tail -1)
+    ask() { echo "(unattended: no dialog) $1" | head -1; echo ""; }
+    tell() { echo "(unattended: no dialog) $1" | head -3; }
+fi
+for f in "$HOME/Downloads/$FLIR_PKG_NAME" "$HOME/Downloads/${FLIR_PKG_NAME%.pkg}.dmg" \
+         "$HOME/Desktop/$FLIR_PKG_NAME" "$HOME/Desktop/${FLIR_PKG_NAME%.pkg}.dmg"; do
+    if [ -f "$f" ]; then FLIR="$f"; break; fi
+done
+if [ "$UNATTENDED" = yes ]; then
+    FLIR=""
+    case "$a_flir" in ""|none) ;; *) FLIR="${a_flir/#\~/$HOME}" ;; esac
+fi
+if [ -z "$FLIR" ] && [ "$UNATTENDED" = no ]; then
+    b=$(ask "FLIR camera support needs Teledyne's Spinnaker SDK for macOS, $FLIR_PKG_NAME (or the .dmg that holds it), from Teledyne's download portal (login required). It was not found in Downloads.
+
+Choose the file, or install scAnt without FLIR camera support (re-run this installer later to add it)." "Install without FLIR" "Choose the file…")
+    if [ "$b" = "Choose the file…" ]; then
+        FLIR=$(osascript -e 'activate' -e 'POSIX path of (choose file with prompt "Teledyne'"'"'s Spinnaker-4.4.0.246.pkg or .dmg" of type {"com.apple.installer-package-archive", "com.apple.disk-image", "pkg", "dmg"})' 2>/dev/null)
+    fi
+fi
+FLIR_ARGS="--no-flir"
+if [ -n "$FLIR" ]; then
+    echo "FLIR file: $FLIR"
+    # Teledyne's licence, from the file itself (only the package's table of contents is unpacked here)
+    W=$(mktemp -d "${TMPDIR:-/tmp}/scant-flir-licence.XXXXXX")
+    PKG="$FLIR"; MNT=""
+    case "$FLIR" in *.dmg)
+        MNT="$W/dmg"; mkdir -p "$MNT"
+        if hdiutil attach -nobrowse -readonly -noautoopen -mountpoint "$MNT" "$FLIR" > /dev/null; then
+            PKG=$(find "$MNT" -maxdepth 2 -name "$FLIR_PKG_NAME" | head -1)
+        else PKG=""; fi ;;
+    esac
+    LIC=""
+    if [ -n "$PKG" ] && pkgutil --expand "$PKG" "$W/toc" > /dev/null 2>&1 && [ -f "$W/toc/Resources/License.txt" ]; then
+        cp "$W/toc/Resources/License.txt" "$HOME/Library/scAnt/FLIR Spinnaker SDK License Agreement.txt"
+        LIC="$HOME/Library/scAnt/FLIR Spinnaker SDK License Agreement.txt"
+    fi
+    [ -n "$MNT" ] && hdiutil detach -quiet "$MNT" 2>/dev/null
+    rm -rf "$W"
+    if [ -z "$LIC" ]; then
+        tell "The file $FLIR is not Teledyne's $FLIR_PKG_NAME (or the .dmg that holds it). scAnt is installed without FLIR camera support; re-run this installer with the right file to add it."
+    else
+        if [ "$UNATTENDED" = yes ]; then
+            b=""; [ "$a_accept" = yes ] && b=Accept
+        else
+            open -e "$LIC" 2>/dev/null
+            b=$(ask "FLIR camera support contains proprietary Teledyne FLIR software, governed by the FLIR Spinnaker SDK License Agreement (now open in TextEdit): use only with FLIR cameras; no further redistribution.
+
+Do you accept the FLIR Spinnaker SDK License Agreement?" "Decline (no FLIR support)" "Accept")
+        fi
+        if [ "$b" = "Accept" ]; then
+            echo "FLIR Spinnaker SDK License Agreement accepted in the dialog"
+            FLIR_ARGS="--flir-pkg $FLIR --accept-flir-license"
+        else
+            echo "FLIR licence not accepted: no FLIR support"
+        fi
+        rm -f "$LIC"
+    fi
+fi
+
+# ---- the installer itself -----------------------------------------------------------------------------------------
+[ "$UNATTENDED" = yes ] || osascript -e "display notification \"Setting up scAnt: the Python environment and tools download now (a few minutes).\" with title \"$TITLE\"" 2>/dev/null
+echo "+ setup.sh --yes $FLIR_ARGS"
+# shellcheck disable=SC2086
+if [ "$FLIR_ARGS" = "--no-flir" ]; then
+    SCANT_SETUP_FILE="${1:-scAnt Setup package}" bash "$SETUP_DIR/setup.sh" --yes --no-flir < /dev/null
+else
+    SCANT_SETUP_FILE="${1:-scAnt Setup package}" bash "$SETUP_DIR/setup.sh" --yes --flir-pkg "$FLIR" --accept-flir-license < /dev/null
+fi
+rc=$?
+echo "setup.sh exit $rc"
+PREFIX="$HOME/Library/scAnt"
+if [ $rc -eq 0 ] && [ -f "$PREFIX/uninstall.sh" ]; then
+    # the uninstaller also forgets this package's receipt and removes the package's log
+    if ! grep -q com.scant3d.scant.setup "$PREFIX/uninstall.sh"; then
+        printf '%s\n' '# added by the .pkg installer' \
+            'pkgutil --volume "$HOME" --forget com.scant3d.scant.setup > /dev/null 2>&1 || true' \
+            'rm -f "$PREFIX/install-pkg.log"; rmdir "$PREFIX" 2>/dev/null || true' >> "$PREFIX/uninstall.sh"
+    fi
+    rm -rf "$SETUP_DIR"   # unpacked again by the next install of the package
+    tell "scAnt $SCANT_VERSION is installed.
+
+Open it from your Applications folder: scAnt in ~/Applications (or with Spotlight). The installation's checks are in ~/Library/scAnt/install-smoke.log."
+    exit 0
+fi
+reason=$(grep -E "^ERROR:|some checks failed" "$PREFIX/install.log" 2>/dev/null | tail -1)
+tell "scAnt Setup could not finish${reason:+: $reason}
+
+The logs are ~/Library/scAnt/install.log and install-pkg.log. Re-run this installer to try again."
+exit 1

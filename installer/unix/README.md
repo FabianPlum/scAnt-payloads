@@ -14,6 +14,28 @@ A script run with `bash` is not subject to Gatekeeper, so the unsigned installer
 Miniforge installer works the same way). The app it creates, `~/Applications/scAnt.app`, is made on the Mac and so
 carries no quarantine flag either.
 
+### The macOS package (double-click)
+
+`scAnt-Setup-<payloadSet>-macos-arm64.pkg` installs the same thing for people who prefer the Installer app. It is
+built from the `.sh` installer by [`macos-pkg/build_pkg.sh`](macos-pkg/build_pkg.sh) and carries exactly its files:
+
+- a per-user ("home domain") product archive: Installer offers only "Install for me only", needs no administrator
+  password, and runs the postinstall as the user;
+- its payload is the `.sh` installer's unpacked tree, put in `~/Library/scAnt/payload-cache/pkg-setup`; the
+  postinstall ([`macos-pkg/postinstall`](macos-pkg/postinstall)) runs `setup.sh --yes` from there (its time limit is
+  raised from 600 to 3600 s) and removes the tree when it is done;
+- FLIR support is handled in dialogs: Teledyne's `Spinnaker-4.4.0.246.pkg` or `.dmg` is taken from Downloads (or
+  Desktop) or chosen in a file dialog, Teledyne's licence from that file opens in TextEdit and must be accepted;
+- at the end a dialog says whether scAnt is installed; the log is `~/Library/scAnt/install-pkg.log`;
+- unattended: `installer -pkg scAnt-Setup-<v>-macos-arm64.pkg -target CurrentUserHomeDirectory` with
+  `~/Library/scAnt/setup-answers.txt` holding `flir=<path to the Spinnaker pkg or dmg>` (or `flir=none`) and
+  `accept-flir-license=yes`: no dialogs then;
+- the uninstaller also forgets the package receipt (`pkgutil --volume "$HOME" --forget com.scant3d.scant.setup`).
+
+The package is unsigned. A downloaded unsigned package is stopped by Gatekeeper: on macOS 15 and later, double-click
+it, close the warning, then System Settings > Privacy & Security > "Open Anyway" (or, in Terminal,
+`xattr -d com.apple.quarantine scAnt-Setup-<v>-macos-arm64.pkg` before opening it). The `.sh` installer avoids this.
+
 ## What it does
 
 | | macOS | Ubuntu |
