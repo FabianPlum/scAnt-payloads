@@ -198,13 +198,21 @@ re-tagging.
 ### Path B — local (offline, iteration, or CI unavailable)
 
 ```powershell
+# rig_stack's library first (git-ignored, so it is never in git archive); needs Visual Studio 2022+ with C++/CMake.
+# Or download the CI-built one (rigstack-native workflow artifact scant_stack-windows-x64) into a folder.
+C:\Users\Legos\anaconda3\envs\scAnt_pro\python.exe -m scripts.rigstack build   # in the scAnt_pro checkout
+
 cd C:\Users\Legos\dev\scAnt-payloads\installer
-.\build_installer.ps1 -ScAntRepo C:\Users\Legos\dev\scAnt_pro
+.\build_installer.ps1 -ScAntRepo C:\Users\Legos\dev\scAnt_pro `
+    -RigStackDir C:\Users\Legos\dev\scAnt_pro\scripts\rigstack\native\build
 # add -LocalPayloadDir <dir> to build against local zips instead of downloading
 ```
 
 The script wipes and repopulates `build\`, stages the app tree via
-`git archive HEAD`, prunes it, writes `APP_TREE_SHA.txt`, generates
+`git archive HEAD`, prunes it (and stops if a firmware or rig_stack source
+file is still in it), adds rig_stack's library from `-RigStackDir` (it refuses
+to build without it), checks the controller firmware builds against
+`firmware\skr\manifest.json`, writes `APP_TREE_SHA.txt`, generates
 `build\pins.iss` from the manifest, and compiles with ISCC. It prints the
 output path, SHA-256 and size — **record all three**, they go in the release
 notes. Make sure the checkout is at the merge commit: the local build takes

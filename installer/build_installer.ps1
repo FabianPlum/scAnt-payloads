@@ -10,10 +10,22 @@
 
   -LocalPayloadDir: directory containing already-built payload zips (skips
    downloading them from the release); zips are still hash-verified.
+
+  -RigStackDir: folder holding rig_stack's native library (scant_stack.dll and
+   scant_stack.json), e.g. <scAnt_pro>\scripts\rigstack\native\build after
+   `python -m scripts.rigstack build`, or the CI-built one. It is git-ignored,
+   so git archive cannot carry it; an app tree with scripts\rigstack is refused
+   without it.
+
+  The staged app tree must not hold closed sources (firmware, rig_stack's
+  native code): scAnt_pro's .gitattributes leaves them out of git archive, the
+  same paths are pruned here again for any older commit, and the build stops if
+  a source file is still there.
 #>
 param(
     [string]$ScAntRepo = "C:\Users\Legos\dev\scAnt_pro",
     [string]$LocalPayloadDir,
+    [string]$RigStackDir,
     [string]$IsccPath = "$env:LOCALAPPDATA\Programs\Inno Setup 7\ISCC.exe"
 )
 
@@ -64,6 +76,42 @@ Get-ChildItem "$appDir\external" -File | Where-Object {
 # internal docs / legacy / tests are not part of the shipped app
 foreach ($d in "docs", "legacy_scripts", "tests") {
     if (Test-Path "$appDir\$d") { Remove-Item "$appDir\$d" -Recurse -Force }
+}
+# closed sources: firmware (Arduino, SKR) and rig_stack's native code. Only the compiled firmware (firmware\) and
+# library (below) ship.
+foreach ($d in "scripts\Arduino_Control", "scripts\SKR_Control", "scripts\rigstack\native", "scripts\rigstack\README.md") {
+    if (Test-Path "$appDir\$d") { Remove-Item "$appDir\$d" -Recurse -Force }
+}
+$sources = Get-ChildItem $appDir -Recurse -File -Include *.ino, *.cpp, *.cu, *.cuh, *.c, *.h, CMakeLists.txt
+if ($sources) { throw "the app tree holds source files that must not ship: $($sources.FullName -join ', ')" }
+
+# rig_stack's native library
+if (Test-Path "$appDir\scripts\rigstack") {
+    if (-not $RigStackDir) { throw "this app tree has rig_stack: pass -RigStackDir <folder with scant_stack.dll and scant_stack.json>" }
+    $libDir = Join-Path $appDir "scripts\rigstack\native\build"
+    New-Item -ItemType Directory -Force $libDir | Out-Null
+    foreach ($name in "scant_stack.dll", "scant_stack.json") {
+        $file = Join-Path $RigStackDir $name
+        if (-not (Test-Path $file)) { throw "rig_stack library file missing: $file" }
+        Copy-Item $file $libDir -Force
+    }
+    $rig = Get-Content (Join-Path $libDir "scant_stack.json") -Raw | ConvertFrom-Json
+    if ((Get-FileHash (Join-Path $libDir "scant_stack.dll") -Algorithm SHA256).Hash.ToLower() -ne $rig.sha256) {
+        throw "scant_stack.dll does not match the sha256 in its scant_stack.json"
+    }
+    Write-Host "rig_stack library staged: sha256 $($rig.sha256)"
+}
+
+# the controller firmware builds must match their manifest
+$fwManifest = Join-Path $appDir "firmware\skr\manifest.json"
+if (Test-Path $fwManifest) {
+    $fw = Get-Content $fwManifest -Raw | ConvertFrom-Json
+    foreach ($b in $fw.builds) {
+        $bin = Join-Path $appDir "firmware\skr\$($b.file)"
+        if (-not (Test-Path $bin)) { throw "firmware build missing: $bin" }
+        if ((Get-FileHash $bin -Algorithm SHA256).Hash.ToLower() -ne $b.sha256) { throw "firmware build does not match its manifest: $bin" }
+    }
+    Write-Host "controller firmware staged: scAnt-SKR $($fw.version), $(@($fw.builds).Count) builds"
 }
 $appMB = [int]((Get-ChildItem $appDir -Recurse -File | Measure-Object Length -Sum).Sum / 1MB)
 Write-Host "app tree staged: $appMB MB"
