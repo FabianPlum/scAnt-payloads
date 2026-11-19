@@ -207,7 +207,8 @@ re-tagging.
 ```powershell
 # rig_stack's library first (git-ignored, so it is never in git archive); needs Visual Studio 2022+ with C++/CMake.
 # Or download the CI-built one (rigstack-native workflow artifact scant_stack-windows-x64) into a folder.
-C:\Users\Legos\anaconda3\envs\scAnt_pro\python.exe -m scripts.rigstack build   # in the scAnt_pro checkout
+cd C:\Users\Legos\dev\scAnt_pro
+python -m scripts.rigstack build   # with the scAnt_pro environment active
 
 cd C:\Users\Legos\dev\scAnt-payloads\installer
 .\build_installer.ps1 -ScAntRepo C:\Users\Legos\dev\scAnt_pro `
