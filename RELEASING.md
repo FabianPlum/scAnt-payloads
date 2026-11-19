@@ -87,10 +87,17 @@ including app-only ones.
   version bump, or a change in installer behaviour.
 - **major** — `manifestVersion` schema change.
 
-Published tags so far: payloads `v0.1.0` – `v0.4.0`; installer
-`installer-v0.3.0` – `installer-v0.4.0`. `0.4.0` is the first proper
-(non-pre-release, Latest) release; the `0.3.x` line was internal testing.
-**Next is `0.4.1`** (or `0.5.0` if a payload or installer behaviour changes).
+Published tags so far: payloads `v0.1.0` – `v0.4.0` and `v1.0.0`; installer
+`installer-v0.3.0` – `installer-v0.4.0` and `installer-v1.0.0`. `0.4.0` was
+the first proper (non-pre-release, Latest) release; the `0.3.x` line was
+internal testing. `1.0.0` is the first major release (Fast Scan, rig_stack,
+the SKR firmware updater; Windows, with the macOS and Ubuntu installers built
+separately): app and installer changes, payload binaries unchanged from 0.4.0.
+**Next is `1.0.1`** (or `1.1.0` if a payload or installer behaviour changes).
+
+From `1.0.0` on, `build_installer.ps1` needs `-RigStackDir` (see Step 6), so
+`installer-v1.0.0` and later only build against payload tags `v1.0.0` and
+later.
 
 ## Step 3 — Rebuild payloads *(only if their inputs changed)*
 
