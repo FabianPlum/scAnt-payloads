@@ -287,6 +287,39 @@ the component versions the manifest pins. (Path A generates all of this.)
 - If `INSTALLER_SPEC.md` §10.1 status text is now stale, update it in the app
   repo.
 
+## macOS and Ubuntu installers
+
+The macOS (Apple Silicon) and Ubuntu (x86-64) installers are self-extracting bash scripts built by
+[`installer/unix/build_installer.sh`](installer/unix/build_installer.sh) (details in
+[`installer/unix/README.md`](installer/unix/README.md)). Each platform has its own manifest
+(`manifest-macos-arm64.json`, `manifest-linux-x86_64.json`) and payload tag (`v<payloadSet>-macos-arm64`,
+`v<payloadSet>-linux-x86_64`), so a platform can ship a version the others skip. There is no CI build yet; they are
+built on a Mac:
+
+1. **rig_stack's library.** macOS: in a checkout of the release commit,
+   `MACOSX_DEPLOYMENT_TARGET=14.0 python -m scripts.rigstack build`, then the bit_identity harness (all lines must
+   match). Without the deployment target the library needs the build Mac's macOS. Linux: the rigstack-native
+   workflow's ubuntu-22.04 artifact (`scant_stack-linux-x64-glibc2.35`) of a commit with the same native sources (the
+   build checks `sources_sha256` against `build.py`).
+2. **Payloads** (only if their inputs changed): `payloads/build_unix_payloads.sh <platform> <dir>` (macOS:
+   `FFMPEG_BUILD=<payloads/ffmpeg-spinvideo/build_ffmpeg.sh output>`); then put the new SHA-256 and sizes in the
+   manifest. Unchanged payloads are re-attached as they are.
+3. **Payload release** (public): tag `v<payloadSet>-<platform>`, release with `manifest-<platform>.json`, the
+   archives and (macOS) `ffmpeg-6.1.6.tar.xz`; mark it not Latest. Round-trip every URL against the manifest.
+4. **Installer:** `installer/unix/build_installer.sh --platform <platform> --scant-repo <scAnt_pro> --ref <release
+   commit> --rigstack-dir <dir>`. It prints the SHA-256 and writes `<installer>.sha256`.
+5. **Gate** (step 7's equivalent): install the exact asset. macOS: on a Mac, with FLIR from Teledyne's pkg; all of
+   `install-smoke.log` ok; start `~/Applications/scAnt.app`; with a scanner attached, a short Fast Scan. Ubuntu: on
+   clean GitHub runners (22.04 and 24.04: core, COLMAP CPU and CUDA, FLIR with Teledyne's installer), then on an
+   Ubuntu machine with the camera. Uninstall cleanly.
+6. **Installer release** on scAnt_pro: a tag that does not start with `installer-v` (that pattern builds the Windows
+   exe), e.g. `installer-unix-v<payloadSet>`; not Latest while the Windows release is a different version. Notes:
+   app commit, payload sets, both SHA-256s, the rig_stack libraries' SHA-256 and compilers, the pinned components,
+   and what was tested.
+
+Published tags so far: `v1.0.1-macos-arm64`, `v1.0.1-linux-x86_64`; installers `installer-unix-v1.0.1` (app tree
+`2e11ceb`: 1.0.0 plus the start without PySpin on macOS and Linux).
+
 ## Rollback
 
 **Published assets are never replaced in place** — the installer verifies

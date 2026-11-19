@@ -1,0 +1,130 @@
+{
+  "manifestVersion": 1,
+  "payloadSet": "1.0.1",
+  "platform": "macos-arm64",
+  "tag": "v1.0.1-macos-arm64",
+  "updated": "2026-11-19",
+  "components": [
+    {
+      "name": "env-lock",
+      "title": "scAnt Python environment — micromamba + explicit conda lock + hash-pinned pip layer (osx-arm64)",
+      "version": "2026.11.19",
+      "micromambaVersion": "2.8.1-0",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.1-macos-arm64/scAnt-payload-env-lock_2026.11.19_macos-arm64.tar.gz",
+      "sha256": "77efe62ee008560ebc07c33e19e1c53534aa0ce513d1755305f3f3522da37540",
+      "size": 6801265,
+      "kind": "tar.gz",
+      "dest": "payload-cache/env-lock",
+      "licenseId": "BSD-3-Clause",
+      "licenseUrl": "https://github.com/FabianPlum/scAnt-payloads/blob/main/payloads/env-lock/unix/README.md",
+      "eulaAccept": false,
+      "python": "cp310",
+      "mandatory": true,
+      "embedded": true,
+      "postInstall": {
+        "createEnv": "micromamba create -y --no-rc -p <install>/env --file scAnt_pro-osx-arm64.lock",
+        "pipRequirements": "requirements-macos-arm64.txt (--no-deps --require-hashes)"
+      }
+    },
+    {
+      "name": "focus-stack",
+      "title": "focus-stack — official 1.5 release, unmodified (focus-stack.app)",
+      "version": "1.5",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.1-macos-arm64/scAnt-payload-focus-stack_1.5_macos-arm64.tar.gz",
+      "sha256": "6b15369866c47a1893a70f077d29817371579e16c17ea4e7b22f7d6a677c76db",
+      "size": 24717328,
+      "kind": "tar.gz",
+      "dest": "app/external/focus-stack",
+      "licenseId": "MIT",
+      "licenseUrl": "https://github.com/PetteriAimonen/focus-stack/blob/1.5/LICENSE.md",
+      "eulaAccept": false,
+      "mandatory": true,
+      "embedded": true
+    },
+    {
+      "name": "shinestacker",
+      "title": "shinestacker focus-stacking library — patched wheel (headless, py3.10)",
+      "version": "1.15.0.post1.dev5",
+      "upstreamSha": "fdea354652439ddc5aabcdac811a1cfcd05a2911",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.0/scAnt-payload-shinestacker_1.15.0.post1.dev5_py3-none-any.zip",
+      "sha256": "b448bdc6573a919b42c454030f5d69e9c09c061963569090a1138e8e5d98dd96",
+      "size": 1372573,
+      "kind": "zip",
+      "dest": "payload-cache/shinestacker",
+      "licenseId": "LGPL-3.0-or-later",
+      "licenseUrl": "https://github.com/FabianPlum/scAnt-payloads/blob/main/payloads/shinestacker/README.md",
+      "eulaAccept": false,
+      "python": "py3-none-any",
+      "mandatory": true,
+      "embedded": true,
+      "notes": "the payload set v1.0.0 asset, unchanged (pure-Python wheel; the same on every platform)",
+      "postInstall": {
+        "pipInstall": "wheel/shinestacker-1.15.0.post1.dev5-py3-none-any.whl (--no-deps)"
+      }
+    },
+    {
+      "name": "ffmpeg-spinvideo",
+      "title": "minimal LGPL FFmpeg 6.1.6 for Teledyne's libSpinVideo (FLIR support)",
+      "version": "6.1.6",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.1-macos-arm64/scAnt-payload-ffmpeg-spinvideo_6.1.6_macos-arm64.tar.gz",
+      "sha256": "1d8fc52d723958785d5168c514b6bb363bbecb1f0cd23a388dbbef14917fc776",
+      "size": 1125677,
+      "kind": "tar.gz",
+      "dest": "flir/lib",
+      "licenseId": "LGPL-2.1-or-later",
+      "licenseUrl": "https://github.com/FabianPlum/scAnt-payloads/blob/main/payloads/ffmpeg-spinvideo/README.md",
+      "eulaAccept": false,
+      "embedded": true,
+      "sourceUrl": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.1-macos-arm64/ffmpeg-6.1.6.tar.xz",
+      "sourceSha256": "d4fcb164028dd3beee5d92c0ac72e46aac6973c75ea12dc14de07bf8f407370a"
+    },
+    {
+      "name": "flir-spinnaker",
+      "title": "FLIR camera support — Teledyne's Spinnaker SDK for macOS, supplied by the customer (unpacked, not installed; libraries unmodified)",
+      "version": "4.4.0.246",
+      "customerSupplied": true,
+      "files": [
+        {
+          "file": "Spinnaker-4.4.0.246.pkg",
+          "sha256": "136ec13395fb7d16afb9f72f6009024c15c44d37bee467ac6d3ee3c577f70b55",
+          "size": 312954552
+        }
+      ],
+      "dest": "flir/lib",
+      "licenseId": "LicenseRef-FLIR-Spinnaker-EULA",
+      "eulaAccept": true,
+      "python": "cp310",
+      "notes": "the licence shown is Resources/License.txt of the customer's pkg; PySpin from its pyspin-310 component (--no-deps)"
+    },
+    {
+      "name": "colmap",
+      "title": "COLMAP 4.2.1 with GLOMAP (macOS arm64, CPU; SiftGPU on OpenGL) — SfM",
+      "version": "4.2.1",
+      "url": "https://github.com/colmap/colmap/releases/download/4.2.1/colmap-arm64-macos.zip",
+      "sha256": "1fe9d65bddd61e0598f3087641cb14c4d4d4c74529e9f58911e8a5238a140a04",
+      "size": 83073913,
+      "kind": "zip",
+      "hostedBy": "upstream",
+      "dest": "app/SPLAT/external/colmap/COLMAP.app",
+      "licenseId": "BSD-3-Clause",
+      "licenseUrl": "https://github.com/colmap/colmap/blob/4.2.1/COPYING.txt",
+      "eulaAccept": false,
+      "minOS": "15.0",
+      "notes": "the zip wraps COLMAP-mac.zip; vendored LSD is AGPL-3.0 and SiftGPU non-commercial, as for the Windows build"
+    },
+    {
+      "name": "brush",
+      "title": "Brush v0.3.0 — Gaussian-splat training (Metal)",
+      "version": "0.3.0",
+      "url": "https://github.com/ArthurBrussee/brush/releases/download/v0.3.0/brush-app-aarch64-apple-darwin.tar.xz",
+      "sha256": "65b2631398c839be3c1d4d7160fe2326389dec87830aac0710985e6690a1048c",
+      "size": 41447012,
+      "kind": "tar.xz",
+      "hostedBy": "upstream",
+      "dest": "app/SPLAT/external/brush",
+      "licenseId": "Apache-2.0",
+      "licenseUrl": "https://github.com/ArthurBrussee/brush/blob/v0.3.0/LICENSE",
+      "eulaAccept": false
+    }
+  ]
+}

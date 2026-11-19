@@ -1,0 +1,34 @@
+scAnt pro — third-party notices (macos-arm64)
+
+scAnt pro is proprietary software of scAnt UG (haftungsbeschränkt); see app/LICENSE and
+NOTICE-scAnt.txt, which also keeps the MIT notice of the open-source scAnt it derives from.
+The components below are installed alongside it and keep their own licences. They run as separate programs
+or as Python packages in scAnt's environment; none of them is modified unless stated.
+
+- Python 3.10 and the packages of scAnt's environment: the conda-forge packages listed in payload-cache/env-lock/scAnt_pro-osx-arm64.lock
+  and the PyPI files in requirements-*.txt there. Each package's licence is in env/conda-meta/*.json, env/info or
+  its *.dist-info folder. Among them: PyQt5 (GPL-3.0, Riverbank Computing), Qt 5 (LGPL-3.0), OpenCV (Apache-2.0)
+  with conda-forge's FFmpeg build, numpy and scipy (BSD), ExifTool 13.59 (Artistic-1.0-Perl or GPL-1.0-or-later)
+  and Perl.
+- micromamba 2.8.1 (BSD-3-Clause): micromamba/micromamba_LICENSE.txt.
+- shinestacker 1.15.0.post1.dev5 (LGPL-3.0-or-later), upstream lucalista/shinestacker at fdea354 with two scAnt
+  patches: the wheel's corresponding source, the patches and the licence are in shinestacker/.
+- focus-stack 1.5 (PetteriAimonen/focus-stack, MIT; ffmpeg/OpenCV and others bundled in focus-stack.app by upstream):
+  focus-stack/LICENSE.md.
+- COLMAP 4.2.1 (with GLOMAP), downloaded at install from https://github.com/colmap/colmap/releases (colmap-arm64-macos.zip),
+  installed as app/SPLAT/external/colmap/COLMAP.app. BSD-3-Clause; it contains third-party code under other terms: the
+  vendored LSD line detector (AGPL-3.0) and SiftGPU (University of North Carolina: education, research and
+  non-profit use; commercial use may need separate permission), and Qt 6 (LGPL-3.0). See COPYING.txt in the app and
+  https://github.com/colmap/colmap/tree/4.2.1/src/thirdparty.
+- Brush 0.3.0, downloaded at install from https://github.com/ArthurBrussee/brush/releases (Apache-2.0; LICENSE in
+  app/SPLAT/external/brush).
+- FLIR camera support (if installed): Teledyne FLIR's Spinnaker SDK 4.4.0.246 libraries and PySpin, unpacked from the
+  customer's own Spinnaker-4.4.0.246.pkg and not modified. Proprietary: the FLIR Spinnaker SDK License Agreement
+  governs them (shown and accepted during setup; a copy is in flir/licenses/FLIR_license.txt with Teledyne's
+  open-source notices). Use only with FLIR cameras; no further redistribution.
+- FFmpeg 6.1.6 (ffmpeg/), a minimal LGPL-2.1-or-later build for Teledyne's libSpinVideo, in flir/lib. Source:
+  ffmpeg-6.1.6.tar.xz on https://github.com/FabianPlum/scAnt-payloads/releases/tag/v1.0.0-macos-arm64 (and
+  https://ffmpeg.org/releases/); configure line in ffmpeg/configure_line.txt.
+
+FLIR and Spinnaker are trademarks of Teledyne FLIR LLC. scAnt is not affiliated with or endorsed by Teledyne
+FLIR. All names are used for identification only.

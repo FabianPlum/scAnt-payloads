@@ -1,0 +1,130 @@
+{
+  "manifestVersion": 1,
+  "payloadSet": "1.0.1",
+  "platform": "linux-x86_64",
+  "tag": "v1.0.1-linux-x86_64",
+  "updated": "2026-11-19",
+  "components": [
+    {
+      "name": "env-lock",
+      "title": "scAnt Python environment — micromamba + explicit conda lock + hash-pinned pip layer (linux-64)",
+      "version": "2026.11.19",
+      "micromambaVersion": "2.8.1-0",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.1-linux-x86_64/scAnt-payload-env-lock_2026.11.19_linux-x86_64.tar.gz",
+      "sha256": "202bdf5da5fa7eea1612e5d5ad4b8b407d2f07feec0bc7fe73dc4181e09a8b10",
+      "size": 7437058,
+      "kind": "tar.gz",
+      "dest": "payload-cache/env-lock",
+      "licenseId": "BSD-3-Clause",
+      "licenseUrl": "https://github.com/FabianPlum/scAnt-payloads/blob/main/payloads/env-lock/unix/README.md",
+      "eulaAccept": false,
+      "python": "cp310",
+      "mandatory": true,
+      "embedded": true,
+      "postInstall": {
+        "createEnv": "micromamba create -y --no-rc -p <install>/env --file scAnt_pro-linux-64.lock",
+        "pipRequirements": "requirements-linux-x86_64.txt (--no-deps --require-hashes)"
+      }
+    },
+    {
+      "name": "focus-stack",
+      "title": "focus-stack — official 1.5 release, unmodified (AppImage, extracted at install)",
+      "version": "1.5",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.1-linux-x86_64/scAnt-payload-focus-stack_1.5_linux-x86_64.tar.gz",
+      "sha256": "39f3d4f0aa6e1129c72a70de20e8b2632ecb47a3fa200022405d99a7418e8618",
+      "size": 63974739,
+      "kind": "tar.gz",
+      "dest": "app/external/focus-stack",
+      "licenseId": "MIT",
+      "licenseUrl": "https://github.com/PetteriAimonen/focus-stack/blob/1.5/LICENSE.md",
+      "eulaAccept": false,
+      "mandatory": true,
+      "embedded": true
+    },
+    {
+      "name": "shinestacker",
+      "title": "shinestacker focus-stacking library — patched wheel (headless, py3.10)",
+      "version": "1.15.0.post1.dev5",
+      "upstreamSha": "fdea354652439ddc5aabcdac811a1cfcd05a2911",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.0/scAnt-payload-shinestacker_1.15.0.post1.dev5_py3-none-any.zip",
+      "sha256": "b448bdc6573a919b42c454030f5d69e9c09c061963569090a1138e8e5d98dd96",
+      "size": 1372573,
+      "kind": "zip",
+      "dest": "payload-cache/shinestacker",
+      "licenseId": "LGPL-3.0-or-later",
+      "licenseUrl": "https://github.com/FabianPlum/scAnt-payloads/blob/main/payloads/shinestacker/README.md",
+      "eulaAccept": false,
+      "python": "py3-none-any",
+      "mandatory": true,
+      "embedded": true,
+      "notes": "the payload set v1.0.0 asset, unchanged (pure-Python wheel; the same on every platform)",
+      "postInstall": {
+        "pipInstall": "wheel/shinestacker-1.15.0.post1.dev5-py3-none-any.whl (--no-deps)"
+      }
+    },
+    {
+      "name": "flir-spinnaker",
+      "title": "FLIR camera support — Teledyne's Spinnaker SDK for Ubuntu (installed by Teledyne's install_spinnaker.sh) and PySpin, supplied by the customer",
+      "version": "4.4.0.246",
+      "customerSupplied": true,
+      "python": "cp310",
+      "files": [
+        {
+          "file": "spinnaker-4.4.0.246-jammy-amd64-pkg.tar.gz",
+          "sha256": "62a095cf5e8602b0e06f393e6194e5ec01a32c79c0a4177ec9da49ff6282f41c",
+          "size": 51682401,
+          "ubuntu": "22.04"
+        },
+        {
+          "file": "spinnaker-4.4.0.246-noble-amd64-pkg.tar.gz",
+          "sha256": "4a5df47c647fca519c27b83b1a75ad9a86872373ac384844eb9af9701f7dc2a4",
+          "size": 51296792,
+          "ubuntu": "24.04"
+        },
+        {
+          "file": "spinnaker_python-4.4.0.246-cp310-cp310-linux_x86_64.tar.gz",
+          "sha256": "4d0fdd88f83ae32890a1855347b78ce645f7fcadb16daf3b1adfee8b9465c467",
+          "size": 52743469
+        }
+      ],
+      "licenseId": "LicenseRef-FLIR-Spinnaker-EULA",
+      "eulaAccept": true,
+      "systemDeps": {
+        "22.04": "libusb-1.0-0 libavcodec58 libavformat58 libswscale5 libswresample3 libavutil56",
+        "24.04": "libusb-1.0-0 libavcodec60 libavformat60 libswscale7 libswresample4 libavutil58"
+      },
+      "notes": "the licence shown is licenses/FLIR_license.txt of the PySpin tarball; the SDK goes to /opt/spinnaker with Teledyne's own script (sudo)"
+    },
+    {
+      "name": "colmap",
+      "title": "COLMAP 4.2.1 with GLOMAP from conda-forge (its own environment; CPU or CUDA 12.9 build) — SfM",
+      "version": "4.2.1",
+      "kind": "conda-lock",
+      "hostedBy": "conda-forge",
+      "dest": "tools/colmap",
+      "locks": {
+        "cpu": "colmap-cpu-linux-64.lock (colmap 4.2.1 cpu_gpl_h68f24ef_409)",
+        "cuda": "colmap-cuda-linux-64.lock (colmap 4.2.1 cuda_129gpl_h960d87c_409; NVIDIA driver 575+, compute capability 7.5+)"
+      },
+      "licenseId": "BSD-3-Clause",
+      "licenseUrl": "https://github.com/colmap/colmap/blob/4.2.1/COPYING.txt",
+      "eulaAccept": false,
+      "notes": "the lock files are in the env-lock payload; scAnt 1.0.0 looks for SPLAT/external/colmap/bin/colmap.exe on Linux, which the installer links to the environment's colmap"
+    },
+    {
+      "name": "brush",
+      "title": "Brush v0.3.0 — Gaussian-splat training (Vulkan)",
+      "version": "0.3.0",
+      "url": "https://github.com/ArthurBrussee/brush/releases/download/v0.3.0/brush-app-x86_64-unknown-linux-gnu.tar.xz",
+      "sha256": "4f0f9a8785d1951c62df26aae247c02c5bba32b00f40b06df4e1c9b867399e20",
+      "size": 44242224,
+      "kind": "tar.xz",
+      "hostedBy": "upstream",
+      "dest": "app/SPLAT/external/brush",
+      "licenseId": "Apache-2.0",
+      "licenseUrl": "https://github.com/ArthurBrussee/brush/blob/v0.3.0/LICENSE",
+      "eulaAccept": false,
+      "notes": "scAnt 1.0.0 looks for brush_app.exe on Linux: the installer adds that name as a link to brush_app"
+    }
+  ]
+}

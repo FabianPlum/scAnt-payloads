@@ -28,6 +28,23 @@ the **manifest**, per-payload **documentation/notices**, and the
 | [`shinestacker`](payloads/shinestacker/) | 1.15.0.post1.dev5 (upstream `fdea3546` + 2 patches) | patched focus-stacking wheel (headless, py3.10) + LGPL corresponding source + patches | **LGPL-3.0** |
 | [`exiftool`](payloads/exiftool/) | 13.59 | official ExifTool Windows build in scAnt layout (`exiftool.exe` + `exiftool_files/`) | Artistic/GPL (Perl terms) |
 
+### macOS (Apple Silicon) and Ubuntu (x86-64)
+
+Since payload set 1.0.1 the macOS and Ubuntu installers (`installer/unix/`) have payload sets of their own, one
+manifest and one release tag per platform: [`manifest-macos-arm64.json`](manifest-macos-arm64.json) (tag
+`v<payloadSet>-macos-arm64`) and [`manifest-linux-x86_64.json`](manifest-linux-x86_64.json) (tag
+`v<payloadSet>-linux-x86_64`), same schema as `manifest.json`. Archives are tar.gz.
+
+| Payload | Platforms | Contents | License |
+|---------|-----------|----------|---------|
+| [`env-lock`](payloads/env-lock/unix/) 2026.11.19 | macOS, Ubuntu | micromamba 2.8.1-0 + explicit conda lock + hash-pinned pip layer (Ubuntu also the COLMAP 4.2.1 locks) | BSD-3-Clause (micromamba); lockfiles MIT |
+| [`focus-stack`](payloads/focus-stack/README-unix.md) 1.5 | macOS, Ubuntu | upstream `focus-stack.app` / `focus-stack.AppImage`, unmodified | MIT |
+| [`ffmpeg-spinvideo`](payloads/ffmpeg-spinvideo/) 6.1.6 | macOS | minimal LGPL FFmpeg for Teledyne's libSpinVideo (its source tarball is on the same release) | LGPL-2.1-or-later |
+| `shinestacker` | macOS, Ubuntu | the payload set v1.0.0 wheel, unchanged | LGPL-3.0 |
+
+Not hosted here: Teledyne's Spinnaker SDK (the customer's own download, checked against the SHA-256 the
+manifest pins), COLMAP (macOS: upstream's release; Ubuntu: conda-forge) and Brush (upstream).
+
 Upstream-hosted tools — **COLMAP 4.1.1** (cuda + nocuda) and **Brush
 v0.3.0** — are *not* mirrored here: the manifest pins their official GitHub
 release URLs + SHA-256 and the installer downloads them from upstream

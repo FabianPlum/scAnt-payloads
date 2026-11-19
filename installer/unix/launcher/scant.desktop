@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=scAnt
+GenericName=3D scanner
+Comment=scAnt pro @VERSION@: scanning, stacking, masking and Gaussian splatting
+Exec=@PREFIX@/bin/scant --log
+Icon=scant
+Terminal=false
+Categories=Graphics;Science;
+StartupWMClass=scAnt.py

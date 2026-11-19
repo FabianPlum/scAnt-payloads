@@ -77,6 +77,14 @@ present; probe on an SDK-free machine (`import PySpin` →
 `GetLibraryVersion()` = wheel's own version → camera enumeration); download
 round-trip hash check against the manifest pin.
 
+## macOS and Ubuntu payloads
+
+`payloads/build_unix_payloads.sh <macos-arm64|linux-x86_64> <out>` rebuilds them from pinned inputs (micromamba and
+focus-stack from upstream releases, checked by SHA-256; the locks and requirements in `payloads/env-lock/unix/`;
+macOS: the FFmpeg build of `payloads/ffmpeg-spinvideo/build_ffmpeg.sh`). Each tar.gz holds a `SHA256SUMS.txt`, and
+content-level reproducibility applies as for the zips. The locks themselves were solved or exported on 2026-11-19
+(`payloads/env-lock/unix/README.md` says how); re-solving gives other pins, which is a new payload version.
+
 ## The bootstrap installer
 
 `installer/build_installer.ps1` builds `scAnt-Setup-<payloadSet>.exe` from:
