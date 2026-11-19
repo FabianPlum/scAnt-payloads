@@ -421,6 +421,8 @@ begin
   if RunHidden('"' + Py + '" -c "import cv2; cv2.ximgproc.createStructuredEdgeDetection(r''' + AppDir + '\scripts\model.yml''); print(''masking model OK'')"', SLog) <> 0 then Fails := Fails + 1;
   if RunHidden('"' + AppDir + '\external\exiftool.exe" -ver', SLog) <> 0 then Fails := Fails + 1;
   if RunHidden('"' + AppDir + '\external\focus-stack\focus-stack.exe" --version', SLog) <> 0 then Fails := Fails + 1;
+  { rig_stack's native library (1.0.0+): found, matches its scant_stack.json, loads }
+  if RunHidden('cd /d "' + AppDir + '" && "' + Py + '" -m scripts.rigstack status', SLog) <> 0 then Fails := Fails + 1;
   if WizardIsComponentSelected('flir') then
     if RunHidden('"' + Py + '" -c "import PySpin; s=PySpin.System.GetInstance(); v=s.GetLibraryVersion(); print(''PySpin'', v.major, v.minor, v.type, v.build); c=s.GetCameras(); print(''cameras:'', c.GetSize()); c.Clear(); s.ReleaseInstance()"', SLog) <> 0 then Fails := Fails + 1;
   if WizardIsComponentSelected('colmap') then
