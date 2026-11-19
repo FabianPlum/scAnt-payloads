@@ -1,0 +1,9 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><style>body{font-family:-apple-system,Helvetica,sans-serif;font-size:13px;line-height:1.45}code{font-size:12px}</style></head>
+<body>
+<h3>scAnt pro @VERSION@ for macOS (Apple Silicon)</h3>
+<p>This installs scAnt for your user account, without administrator rights, in <code>~/Library/scAnt</code>, and adds <b>scAnt</b> to the Applications folder in your home folder. It sets up the Python environment, focus stacking (shinestacker, focus-stack, rig_stack), ExifTool, and COLMAP and Brush for Gaussian splatting (COLMAP needs macOS 15 or later).</p>
+<p><b>FLIR cameras:</b> put Teledyne's <code>Spinnaker-4.4.0.246.pkg</code> (or the <code>.dmg</code> that holds it) in your Downloads folder first; the installer finds it there, or asks for it. It then shows Teledyne's licence agreement for you to accept.</p>
+<p>Installing needs an internet connection and about 5 GB of disk space. The step <i>Running package scripts</i> downloads the Python environment and the tools and takes a few minutes; scAnt tells you in a dialog when it is done.</p>
+<p>A copy of the details is written to <code>~/Library/scAnt/install.log</code>. To remove scAnt later, run <code>~/Library/scAnt/uninstall.sh</code> in Terminal.</p>
+</body></html>

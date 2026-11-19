@@ -308,6 +308,7 @@ built on a Mac:
    archives and (macOS) `ffmpeg-6.1.6.tar.xz`; mark it not Latest. Round-trip every URL against the manifest.
 4. **Installer:** `installer/unix/build_installer.sh --platform <platform> --scant-repo <scAnt_pro> --ref <release
    commit> --rigstack-dir <dir>`. It prints the SHA-256 and writes `<installer>.sha256`.
+   macOS also: `installer/unix/macos-pkg/build_pkg.sh <the .sh> <dir>` makes the `.pkg` from it (same files).
 5. **Gate** (step 7's equivalent): install the exact asset. macOS: on a Mac, with FLIR from Teledyne's pkg; all of
    `install-smoke.log` ok; start `~/Applications/scAnt.app`; with a scanner attached, a short Fast Scan. Ubuntu: on
    clean GitHub runners (22.04 and 24.04: core, COLMAP CPU and CUDA, FLIR with Teledyne's installer), then on an
@@ -318,7 +319,7 @@ built on a Mac:
    and what was tested.
 
 Published tags so far: `v1.0.1-macos-arm64`, `v1.0.1-linux-x86_64`; installers `installer-unix-v1.0.1` (app tree
-`2e11ceb`: 1.0.0 plus the start without PySpin on macOS and Linux).
+`2e11ceb`: 1.0.0 plus the start without PySpin on macOS and Linux; the macOS `.pkg` added to that release later).
 
 ## Rollback
 

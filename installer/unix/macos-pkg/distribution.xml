@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- scAnt-Setup-@VERSION@-macos-arm64.pkg: a per-user package (no administrator rights); see build_pkg.sh -->
+<installer-gui-script minSpecVersion="2">
+    <title>scAnt @VERSION@</title>
+    <welcome file="welcome.html" mime-type="text/html"/>
+    <conclusion file="conclusion.html" mime-type="text/html"/>
+    <domains enable_anywhere="false" enable_currentUserHome="true" enable_localSystem="false"/>
+    <options customize="never" require-scripts="false" hostArchitectures="arm64"/>
+    <allowed-os-versions>
+        <os-version min="14.0"/>
+    </allowed-os-versions>
+    <choices-outline>
+        <line choice="default">
+            <line choice="com.scant3d.scant.setup"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="com.scant3d.scant.setup" visible="false">
+        <pkg-ref id="com.scant3d.scant.setup"/>
+    </choice>
+    <pkg-ref id="com.scant3d.scant.setup" version="@VERSION@" onConclusion="none">scant-setup.pkg</pkg-ref>
+</installer-gui-script>
