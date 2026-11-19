@@ -99,6 +99,11 @@ if (Test-Path "$appDir\scripts\rigstack") {
     if ((Get-FileHash (Join-Path $libDir "scant_stack.dll") -Algorithm SHA256).Hash.ToLower() -ne $rig.sha256) {
         throw "scant_stack.dll does not match the sha256 in its scant_stack.json"
     }
+    # built from this commit's native sources? build.py (staged) pins their digest, which its tests keep current
+    $pin = [regex]::Match((Get-Content "$appDir\scripts\rigstack\build.py" -Raw), 'SOURCES_SHA256 = "([0-9a-f]{64})"').Groups[1].Value
+    if (-not $pin -or $rig.sources_sha256 -ne $pin) {
+        throw "scant_stack.dll was built from sources $($rig.sources_sha256), not this commit's ($pin): rebuild it (python -m scripts.rigstack build)"
+    }
     Write-Host "rig_stack library staged: sha256 $($rig.sha256)"
 }
 
