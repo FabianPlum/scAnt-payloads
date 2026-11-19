@@ -1,8 +1,8 @@
 {
   "manifestVersion": 1,
-  "payloadSet": "1.0.1",
+  "payloadSet": "1.0.2",
   "platform": "macos-arm64",
-  "tag": "v1.0.1-macos-arm64",
+  "tag": "v1.0.2-macos-arm64",
   "updated": "2026-11-19",
   "components": [
     {
@@ -10,7 +10,7 @@
       "title": "scAnt Python environment — micromamba + explicit conda lock + hash-pinned pip layer (osx-arm64)",
       "version": "2026.11.19",
       "micromambaVersion": "2.8.1-0",
-      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.1-macos-arm64/scAnt-payload-env-lock_2026.11.19_macos-arm64.tar.gz",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.2-macos-arm64/scAnt-payload-env-lock_2026.11.19_macos-arm64.tar.gz",
       "sha256": "77efe62ee008560ebc07c33e19e1c53534aa0ce513d1755305f3f3522da37540",
       "size": 6801265,
       "kind": "tar.gz",
@@ -30,7 +30,7 @@
       "name": "focus-stack",
       "title": "focus-stack — official 1.5 release, unmodified (focus-stack.app)",
       "version": "1.5",
-      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.1-macos-arm64/scAnt-payload-focus-stack_1.5_macos-arm64.tar.gz",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.2-macos-arm64/scAnt-payload-focus-stack_1.5_macos-arm64.tar.gz",
       "sha256": "6b15369866c47a1893a70f077d29817371579e16c17ea4e7b22f7d6a677c76db",
       "size": 24717328,
       "kind": "tar.gz",
@@ -66,7 +66,7 @@
       "name": "ffmpeg-spinvideo",
       "title": "minimal LGPL FFmpeg 6.1.6 for Teledyne's libSpinVideo (FLIR support)",
       "version": "6.1.6",
-      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.1-macos-arm64/scAnt-payload-ffmpeg-spinvideo_6.1.6_macos-arm64.tar.gz",
+      "url": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.2-macos-arm64/scAnt-payload-ffmpeg-spinvideo_6.1.6_macos-arm64.tar.gz",
       "sha256": "1d8fc52d723958785d5168c514b6bb363bbecb1f0cd23a388dbbef14917fc776",
       "size": 1125677,
       "kind": "tar.gz",
@@ -75,7 +75,7 @@
       "licenseUrl": "https://github.com/FabianPlum/scAnt-payloads/blob/main/payloads/ffmpeg-spinvideo/README.md",
       "eulaAccept": false,
       "embedded": true,
-      "sourceUrl": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.1-macos-arm64/ffmpeg-6.1.6.tar.xz",
+      "sourceUrl": "https://github.com/FabianPlum/scAnt-payloads/releases/download/v1.0.2-macos-arm64/ffmpeg-6.1.6.tar.xz",
       "sourceSha256": "d4fcb164028dd3beee5d92c0ac72e46aac6973c75ea12dc14de07bf8f407370a"
     },
     {

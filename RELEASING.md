@@ -319,7 +319,8 @@ built on a Mac:
    and what was tested.
 
 Published tags so far: `v1.0.1-macos-arm64`, `v1.0.1-linux-x86_64`; installers `installer-unix-v1.0.1` (app tree
-`2e11ceb`: 1.0.0 plus the start without PySpin on macOS and Linux; the macOS `.pkg` added to that release later).
+`2e11ceb`: 1.0.0 plus the start without PySpin on macOS and Linux; the macOS `.pkg` added to that release later); `v1.0.2-macos-arm64`, `v1.0.2-linux-x86_64` and
+`installer-unix-v1.0.2` (known-pose SfM, #38; payload files unchanged from 1.0.1).
 
 ## Rollback
 
